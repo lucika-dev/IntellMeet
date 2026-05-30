@@ -1,0 +1,48 @@
+---
+interface Props {
+	src: string;
+	alt: string;
+	href?: string;
+	size?: number;
+	className?: string;
+}
+
+const {
+	src,
+	alt,
+	href = "/",
+	size = 48,
+	className = "",
+} = Astro.props;
+---
+
+<a
+	href={href}
+	aria-label={alt}
+	class={`shrink-0 ${className}`}
+>
+	<div
+		role="img"
+		class="
+			block
+			bg-foreground
+			transition-all
+			duration-300
+			hover:opacity-80
+		"
+		style={`
+			width: ${size}px;
+			height: ${size}px;
+
+			mask-image: url("${src}");
+			mask-size: contain;
+			mask-repeat: no-repeat;
+			mask-position: center;
+
+			-webkit-mask-image: url("${src}");
+			-webkit-mask-size: contain;
+			-webkit-mask-repeat: no-repeat;
+			-webkit-mask-position: center;
+		`}
+	/>
+</a>

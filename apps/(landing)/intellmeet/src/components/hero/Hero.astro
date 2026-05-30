@@ -1,0 +1,90 @@
+---
+import HeroIllustration from "../svg/HeroIllustration";
+---
+
+<section class="sticky top-0 flex h-screen w-full justify-center overflow-hidden px-6">
+	<div
+		id="hero-fade"
+		class="absolute inset-0 will-change-[opacity]"
+	>
+		<div
+			id="hero-overlay"
+			class="absolute inset-0 bg-background opacity-0 pointer-events-none"
+		></div>
+
+		<div
+			class="relative z-10 mx-auto flex max-w-[90rem] flex-col items-center gap-6 pt-40 text-center"
+		>
+			<h1
+				class="text-4xl tracking-tight text-foreground md:text-8xl"
+			>
+				Smart Meeting &
+				<br />
+				Collaboration Platform
+			</h1>
+
+			<p
+				class="max-w-2xl text-base text-muted-foreground md:text-lg"
+			>
+				Real-Time Video Meetings • AI Summaries •
+				Smart Action Items • Team Collaboration
+			</p>
+
+			<div
+				class="mt-9 flex items-center overflow-hidden rounded-xl border border-border bg-card shadow-sm"
+			>
+				<input
+					type="text"
+					placeholder="Just Enter a code or link"
+					class="w-[240px] bg-transparent px-5 py-3 text-base text-foreground outline-none placeholder:text-muted-foreground md:w-[320px] md:text-lg"
+				/>
+
+				<button
+					class="m-1 rounded-md bg-primary px-6 py-3 text-primary-foreground"
+				>
+					Join Now
+				</button>
+			</div>
+		</div>
+
+		<div
+			class="absolute bottom-0 left-0 w-full pointer-events-none"
+		>
+			<HeroIllustration className="h-auto w-full" />
+		</div>
+	</div>
+</section>
+
+<script>
+	const fadeRef = document.getElementById("hero-fade");
+	const overlayRef =
+		document.getElementById("hero-overlay");
+
+	function updateHero() {
+		if (!fadeRef) return;
+
+		const scroll = window.scrollY;
+		const vh = window.innerHeight;
+
+		const progress = Math.min(
+			scroll / (vh * 0.8),
+			1
+		);
+
+		const opacity = 1 - progress * progress;
+
+		fadeRef.style.opacity = String(
+			Math.max(opacity, 0)
+		);
+
+		if (overlayRef) {
+			overlayRef.style.opacity = String(progress);
+		}
+	}
+
+	updateHero();
+
+	window.addEventListener("scroll", updateHero, {
+		passive: true,
+	});
+</script>

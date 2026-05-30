@@ -1,0 +1,78 @@
+---
+import ThemeToggle from "../common/ThemeToggle.astro";
+import Logo from "../common/Logo.astro";
+
+import GoogleAuthButton from "../common/GoogleAuthButton";
+---
+
+<header class="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
+	<div
+		class="glass flex h-20 w-full max-w-7xl items-center justify-between rounded-full border border-white/10 px-6 shadow-[0_0_40px_rgba(255,120,120,0.08)] backdrop-blur-xl md:px-10"
+	>
+		<!-- Logo -->
+		<div class="flex shrink-0 items-center">
+			<div class="relative">
+				<div
+					aria-hidden="true"
+					class="pointer-events-none absolute inset-0 -z-10 rounded-full bg-primary/20 blur-2xl"
+				></div>
+
+				<Logo
+					src="/Logo.svg"
+					alt="IntellMeet"
+					size={150}
+					className="relative h-auto w-auto"
+				/>
+			</div>
+		</div>
+
+		<!-- Nav -->
+		<nav class="hidden items-center gap-8 lg:flex">
+			<a
+				href="/"
+				class="text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
+			>
+				Home
+			</a>
+
+			<a
+				href="#demo"
+				class="text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
+			>
+				Demo
+			</a>
+
+			<a
+				href="#pricing"
+				class="text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
+			>
+				Pricing
+			</a>
+		</nav>
+
+		<!-- Actions -->
+		<div class="flex items-center gap-3">
+			<div class="relative">
+				<div
+					aria-hidden="true"
+					class="pointer-events-none absolute inset-0 -z-10 rounded-xl bg-primary/50 blur-xl"
+				></div>
+
+				<div class="relative">
+					<GoogleAuthButton client:load />
+				</div>
+			</div>
+
+			<div class="relative">
+				<div
+					aria-hidden="true"
+					class="pointer-events-none absolute inset-0 -z-10 rounded-full bg-primary/40 blur-xl"
+				></div>
+
+				<div class="relative">
+					<ThemeToggle />
+				</div>
+			</div>
+		</div>
+	</div>
+</header>

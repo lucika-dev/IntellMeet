@@ -1,0 +1,245 @@
+---
+// src/components/background/InteractiveGrid.astro
+
+interface Props {
+	gap?: number;
+	radius?: number;
+	strength?: number;
+	smooth?: number;
+	dotSize?: number;
+	dotHoverScale?: number;
+}
+
+const {
+	gap = 22,
+	radius = 140,
+	strength = 10,
+	smooth = 0.12,
+	dotSize = 1.2,
+	dotHoverScale = 1.2,
+} = Astro.props;
+---
+
+<div class="interactive-grid">
+	<canvas id="interactive-grid-canvas"></canvas>
+</div>
+
+<script
+	define:vars={{
+		gap,
+		radius,
+		strength,
+		smooth,
+		dotSize,
+		dotHoverScale,
+	}}
+>
+	const canvas = document.getElementById(
+		"interactive-grid-canvas"
+	);
+
+	const ctx = canvas.getContext("2d");
+
+	let width = 0;
+	let height = 0;
+
+	let points = [];
+
+	const mouse = {
+		x: -9999,
+		y: -9999,
+	};
+
+	function getForegroundColor(alpha) {
+		const styles = getComputedStyle(
+			document.documentElement
+		);
+
+		const color =
+			styles
+				.getPropertyValue(
+					"--foreground"
+				)
+				.trim();
+
+		return `color-mix(in srgb, ${color} ${
+			alpha * 100
+		}%, transparent)`;
+	}
+
+	function resize() {
+		width = window.innerWidth;
+		height = window.innerHeight;
+
+		const dpr = Math.min(
+			window.devicePixelRatio || 1,
+			2
+		);
+
+		canvas.width = width * dpr;
+		canvas.height = height * dpr;
+
+		canvas.style.width = `${width}px`;
+		canvas.style.height = `${height}px`;
+
+		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+		buildGrid();
+	}
+
+	function buildGrid() {
+		points = [];
+
+		for (
+			let x = 0;
+			x < width + gap;
+			x += gap
+		) {
+			for (
+				let y = 0;
+				y < height + gap;
+				y += gap
+			) {
+				points.push({
+					ox: x,
+					oy: y,
+
+					x,
+					y,
+
+					force: 0,
+				});
+			}
+		}
+	}
+
+	resize();
+
+	window.addEventListener(
+		"resize",
+		resize
+	);
+
+	window.addEventListener(
+		"mousemove",
+		(e) => {
+			mouse.x = e.clientX;
+			mouse.y = e.clientY;
+		}
+	);
+
+	window.addEventListener(
+		"mouseleave",
+		() => {
+			mouse.x = -9999;
+			mouse.y = -9999;
+		}
+	);
+
+	function draw() {
+		ctx.clearRect(0, 0, width, height);
+
+		for (const point of points) {
+			const dx = mouse.x - point.ox;
+			const dy = mouse.y - point.oy;
+
+			const dist = Math.sqrt(
+				dx * dx + dy * dy
+			);
+
+			if (dist < radius) {
+				const angle = Math.atan2(
+					dy,
+					dx
+				);
+
+				const intensity =
+					1 - dist / radius;
+
+				const targetX =
+					point.ox -
+					Math.cos(angle) *
+						intensity *
+						strength;
+
+				const targetY =
+					point.oy -
+					Math.sin(angle) *
+						intensity *
+						strength;
+
+				point.x +=
+					(targetX - point.x) *
+					smooth;
+
+				point.y +=
+					(targetY - point.y) *
+					smooth;
+
+				point.force +=
+					(intensity -
+						point.force) *
+					0.15;
+			} else {
+				point.x +=
+					(point.ox - point.x) *
+					smooth;
+
+				point.y +=
+					(point.oy - point.y) *
+					smooth;
+
+				point.force +=
+					(0 - point.force) *
+					0.12;
+			}
+
+			const size =
+				dotSize +
+				point.force *
+					dotHoverScale;
+
+			const alpha =
+				0.35 +
+				point.force * 0.45;
+
+			ctx.beginPath();
+
+			ctx.arc(
+				point.x,
+				point.y,
+				size,
+				0,
+				Math.PI * 2
+			);
+
+			ctx.fillStyle =
+				getForegroundColor(alpha);
+
+			ctx.fill();
+		}
+
+		requestAnimationFrame(draw);
+	}
+
+	draw();
+</script>
+
+<style>
+	.interactive-grid {
+		position: fixed;
+		inset: 0;
+
+		z-index: -1;
+
+		pointer-events: none;
+		overflow: hidden;
+	}
+
+	canvas {
+		display: block;
+
+		width: 100%;
+		height: 100%;
+	}
+</style>
