@@ -1,111 +1,47 @@
-import { THEMES }
-  from '../registry/theme-urls';
-
 import {
-  cacheTheme,
   getCachedThemeCss,
-  getCachedThemeUrl,
 } from './cache-theme';
 
-import { convertThemeToCss }
-  from './convert-theme';
-
-function injectTheme(
-  css: string
-) {
-  const existing =
-    document.getElementById(
-      'wraith-theme'
-    );
-
-  if (existing) {
-    existing.remove();
-  }
-
-  const style =
-    document.createElement('style');
-
-  style.id = 'wraith-theme';
-
-  style.textContent = css;
-
-  document.head.appendChild(
-    style
-  );
-}
-
-async function fetchTheme(
-  url: string
-) {
-  const response =
-    await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(
-      'Theme fetch failed'
-    );
-  }
-
-  return response.json();
-}
-
-export async function loadTheme() {
+export function loadTheme() {
   const cachedCss =
     getCachedThemeCss();
 
-  const cachedUrl =
-    getCachedThemeUrl();
+  console.log(
+    '[loadTheme] cached css',
+    cachedCss
+  );
 
-  if (cachedCss) {
-    injectTheme(cachedCss);
-  }
-
-  if (cachedUrl) {
-    try {
-      const theme =
-        await fetchTheme(
-          cachedUrl
-        );
-
-      const css =
-        convertThemeToCss(
-          theme
-        );
-
-      injectTheme(css);
-
-      cacheTheme(
-        css,
-        cachedUrl
-      );
-
-      return;
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  try {
-    const defaultThemeUrl =
-      THEMES.default;
-
-    const theme =
-      await fetchTheme(
-        defaultThemeUrl
-      );
-
-    const css =
-      convertThemeToCss(
-        theme
-      );
-
-    injectTheme(css);
-
-    cacheTheme(
-      css,
-      defaultThemeUrl
+  if (!cachedCss) {
+    console.log(
+      '[loadTheme] no cached theme'
     );
-  } catch (error) {
-    console.error(error);
+
+    return;
   }
+
+  let style =
+    document.getElementById(
+      'wraith-theme'
+    ) as HTMLStyleElement | null;
+
+  if (!style) {
+    style =
+      document.createElement(
+        'style'
+      );
+
+    style.id =
+      'wraith-theme';
+
+    document.head.appendChild(
+      style
+    );
+  }
+
+  style.textContent =
+    cachedCss;
+
+  console.log(
+    '[loadTheme] restored cached theme'
+  );
 }

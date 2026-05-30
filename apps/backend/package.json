@@ -1,0 +1,50 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "IntellMeet backend service",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "lint": "eslint . --ext .ts",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@wraith/auth": "workspace:*",
+    "@supabase/supabase-js": "catalog:",
+    "axios": "catalog:",
+    "bcrypt": "catalog:",
+    "cloudinary": "catalog:",
+    "compression": "catalog:",
+    "cookie-parser": "catalog:",
+    "cors": "catalog:",
+    "dotenv": "catalog:",
+    "express": "catalog:",
+    "express-rate-limit": "catalog:",
+    "helmet": "catalog:",
+    "ioredis": "catalog:",
+    "jsonwebtoken": "catalog:",
+    "mongoose": "catalog:",
+    "morgan": "catalog:",
+    "multer": "catalog:",
+    "socket.io": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "catalog:",
+    "@types/cookie-parser": "catalog:",
+    "@types/cors": "catalog:",
+    "@types/express": "catalog:",
+    "@types/jsonwebtoken": "catalog:",
+    "@types/multer": "catalog:",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

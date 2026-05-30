@@ -1,13 +1,14 @@
 import { THEMES }
   from '../registry/theme-urls';
 
-import { cacheTheme }
+import { setCachedThemeCss }
   from '../runtime/cache-theme';
 
 import { convertThemeToCss }
   from '../runtime/convert-theme';
 
-let activeRequestId = 0;
+const ACTIVE_THEME_KEY =
+  'wraith-active-theme';
 
 async function fetchTheme(
   url: string
@@ -27,59 +28,116 @@ async function fetchTheme(
 function injectTheme(
   css: string
 ) {
-  const existing =
+  let style =
     document.getElementById(
       'wraith-theme'
-    );
+    ) as HTMLStyleElement | null;
 
-  if (existing) {
-    existing.remove();
+  if (!style) {
+    style =
+      document.createElement(
+        'style'
+      );
+
+    style.id =
+      'wraith-theme';
+
+    document.head.appendChild(
+      style
+    );
   }
 
-  const style =
-    document.createElement('style');
-
-  style.id = 'wraith-theme';
-
-  style.textContent = css;
-
-  document.head.appendChild(
-    style
-  );
+  if (
+    style.textContent !== css
+  ) {
+    style.textContent = css;
+  }
 }
 
 export const themeManager = {
   async setTheme(
     themeName: keyof typeof THEMES
   ) {
-    const requestId =
-      ++activeRequestId;
-
-    const url =
-      THEMES[themeName];
-
     try {
-      const theme =
-        await fetchTheme(url);
+      console.log(
+        '[themeManager] applying',
+        themeName
+      );
 
-      if (
-        requestId !==
-        activeRequestId
-      ) {
-        return;
-      }
+      const url =
+        THEMES[themeName];
+
+      const theme =
+        await fetchTheme(
+          url
+        );
+
+      console.log(
+        '[themeManager] fetched theme'
+      );
 
       const css =
         convertThemeToCss(
           theme
         );
 
+      console.log(
+        '[themeManager] converted css'
+      );
+
       injectTheme(css);
 
-      cacheTheme(css, url);
+      console.log(
+        '[themeManager] injected css'
+      );
+
+      setCachedThemeCss(
+        css
+      );
+
+      const current =
+        localStorage.getItem(
+          ACTIVE_THEME_KEY
+        );
+
+      if (current !== themeName) {
+        localStorage.setItem(
+          ACTIVE_THEME_KEY,
+          themeName
+        );
+      }
+
+      console.log(
+        '[themeManager] saved',
+        themeName
+      );
     } catch (error) {
-      console.error(error);
+      console.error(
+        '[themeManager] failed',
+        error
+      );
     }
+  },
+
+  restoreTheme() {
+    const css =
+      localStorage.getItem(
+        'wraith-theme-css'
+      );
+
+    if (!css) {
+      console.log(
+        '[themeManager] no cached css'
+      );
+
+      return;
+    }
+
+    injectTheme(css);
+
+    console.log(
+      '[themeManager] restored cached css'
+    );
   },
 
   themes: THEMES,

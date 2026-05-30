@@ -1,0 +1,34 @@
+@layer components {
+  .glass {
+    @apply
+      bg-foreground/15
+      backdrop-blur-xl
+      border border-border/30
+      shadow-[0_8px_30px_rgba(0,0,0,0.12)];
+  }
+
+  #global-rocket-loader {
+    @apply fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background;
+    font-family: var(--font-sans);
+    transition: transform 0.85s cubic-bezier(0.85, 0, 0.15, 1), opacity 0.5s ease;
+  }
+
+  #rocket-num-wrap {
+    @apply flex items-baseline font-black text-foreground select-none tabular-nums italic tracking-tighter;
+  }
+
+  .vibrate-rocket {
+    animation: vibrate 0.05s infinite linear;
+  }
+}
+
+@layer base {
+  @keyframes vibrate {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-2px, 1px); }
+    40% { transform: translate(2px, -1px); }
+    60% { transform: translate(-2px, -1px); }
+    80% { transform: translate(2px, 1px); }
+    100% { transform: translate(0, 0); }
+  }
+}

@@ -1,29 +1,17 @@
-import { STORAGE_KEYS }
-  from '../constants/storage';
+const THEME_CSS_KEY =
+  'wraith-theme-css';
 
-export function cacheTheme(
-  css: string,
-  url: string
+export function setCachedThemeCss(
+  css: string
 ) {
   localStorage.setItem(
-    STORAGE_KEYS.themeCss,
+    THEME_CSS_KEY,
     css
-  );
-
-  localStorage.setItem(
-    STORAGE_KEYS.themeUrl,
-    url
   );
 }
 
 export function getCachedThemeCss() {
   return localStorage.getItem(
-    STORAGE_KEYS.themeCss
-  );
-}
-
-export function getCachedThemeUrl() {
-  return localStorage.getItem(
-    STORAGE_KEYS.themeUrl
+    THEME_CSS_KEY
   );
 }
