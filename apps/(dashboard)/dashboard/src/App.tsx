@@ -40,26 +40,23 @@ function App() {
   if (!isAuthenticated) {
     return (
       <div className="h-screen w-screen flex flex-col items-center justify-center bg-background text-foreground p-4 text-center">
-        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-          <span className="text-3xl">🔒</span>
-        </div>
-        <h1 className="text-2xl font-bold mb-2 tracking-tight">Access Restricted</h1>
-        <p className="text-muted-foreground mb-4 max-w-sm">
+        <h1 className="text-8xl font-bold mb-2 tracking-tight">Access Restricted</h1>
+        <p className="text-muted-foreground text-2xl mb-14">
           Please log in via the main application to securely access your meeting dashboard.
         </p>
         <div className="flex flex-col gap-3">
           <a 
             href={APP_ORIGIN}
-            className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-semibold shadow-lg hover:bg-primary/90 transition hover:scale-105 active:scale-95 text-sm"
+            className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-semibold shadow-lg hover:bg-primary/90 transition hover:scale-105 active:scale-95 text-2xl"
           >
-            Return to Login
+            Login From App
           </a>
           <button 
              onClick={() => {
                console.log('Manual reload requested');
                window.location.reload();
              }}
-             className="text-xs text-muted-foreground underline hover:text-foreground"
+             className="text-xl text-muted-foreground underline hover:text-foreground"
           >
             Refresh state
           </button>

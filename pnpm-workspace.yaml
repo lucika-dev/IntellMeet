@@ -1,11 +1,12 @@
 packages:
-  - "apps/*"
+  - "apps/**"
   - "packages/**"
   - "services/**"
 
 allowBuilds:
   bcrypt: set this to true or false
   esbuild: set this to true or false
+  unrs-resolver: true
 
 catalog:
   "react": 19.2.0
