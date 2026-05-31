@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
+  "extends": "@wraith/typescript-config/react-library.json",
   "compilerOptions": {
     "ignoreDeprecations": "5.0",
     "module": "ESNext",
