@@ -10,6 +10,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
+    "check-peer-deps": "node scripts/check-peer-deps.js",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "semver": "7.3.8",
     "prettier": "catalog:",
     "prettier-plugin-astro": "catalog:",
     "turbo": "catalog:",
