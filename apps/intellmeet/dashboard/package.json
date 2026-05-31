@@ -26,6 +26,7 @@
     "react-router-dom": "catalog:",
     "recharts": "catalog:",
     "socket.io-client": "catalog:",
+    "tw-animate-css": "catalog:",
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
     "zustand": "catalog:"
