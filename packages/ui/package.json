@@ -36,7 +36,6 @@
   },
 
   "dependencies": {
-    "@base-ui-components/react": "latest",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "radix-ui": "catalog:",

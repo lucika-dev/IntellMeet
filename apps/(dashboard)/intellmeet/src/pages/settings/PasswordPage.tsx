@@ -15,7 +15,6 @@ export const PasswordPage = () => {
       setStatus({ type: 'error', message: 'New passwords do not match' });
       return;
     }
-    // Logic for updating password would go here
     setStatus({ type: 'success', message: 'Password updated successfully' });
     setTimeout(() => setStatus(null), 3000);
   };

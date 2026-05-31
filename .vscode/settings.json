@@ -1,6 +1,12 @@
 {
   "deno.enable": true,
-  "deno.enablePaths": [
-    "supabase/functions"
-  ]
+  "deno.enablePaths": ["supabase/functions"],
+
+  "[astro]": {
+    "editor.defaultFormatter": "astro-build.astro-vscode"
+  },
+
+  "prettier.printWidth": 200,
+  "prettier.singleAttributePerLine": false,
+  "prettier.htmlWhitespaceSensitivity": "ignore"
 }

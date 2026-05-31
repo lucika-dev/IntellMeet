@@ -25,6 +25,7 @@
     "react-hot-toast": "catalog:",
     "react-router-dom": "catalog:",
     "recharts": "catalog:",
+    "socket.io-client": "catalog:",
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
     "zustand": "catalog:"

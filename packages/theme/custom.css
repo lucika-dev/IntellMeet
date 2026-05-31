@@ -7,6 +7,44 @@
       shadow-[0_8px_30px_rgba(0,0,0,0.12)];
   }
 
+  .glass-card {
+    @apply border border-border/40 bg-card/75 backdrop-blur-2xl;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  }
+
+  .premium-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  .premium-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .premium-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .premium-scrollbar::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: content-box;
+    background-color: hsl(var(--border));
+  }
+
+  .dashboard-backdrop {
+    background-image:
+      radial-gradient(circle at top left, rgba(244, 114, 182, 0.12), transparent 28%),
+      radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 26%),
+      radial-gradient(circle at bottom, rgba(168, 85, 247, 0.08), transparent 22%);
+  }
+
+  .dark .dashboard-backdrop {
+    background-image: none;
+    background-color: hsl(var(--background));
+  }
+
   #global-rocket-loader {
     @apply fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background;
     font-family: var(--font-sans);

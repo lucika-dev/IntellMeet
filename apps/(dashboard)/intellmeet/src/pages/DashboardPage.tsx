@@ -1,124 +1,508 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../api/mockApi';
-import { Video, CheckSquare, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
+
+import { ArrowUpRight } from 'lucide-react';
+
+import { meetingsApi } from '../api/meetingsApi';
+
 import { PageTransition } from '../components/PageTransition';
+import { MeetingCard } from '../components/MeetingCard';
+
 import { useAuthStore } from '../store/authStore';
 
-const useTilt = () => {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-100, 100], [10, -10]);
-  const rotateY = useTransform(x, [-100, 100], [-10, 10]);
+const ctaForStatus = (status: string) => {
+	if (status === 'live') return 'Join';
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    x.set(e.clientX - centerX);
-    y.set(e.clientY - centerY);
-  };
+	if (
+		status === 'recorded' ||
+		status === 'ended'
+	) {
+		return 'Summary';
+	}
 
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  return { rotateX, rotateY, handleMouseMove, handleMouseLeave };
+	return 'Register';
 };
 
-const TiltCard = ({ children, className }: any) => {
-  const { rotateX, rotateY, handleMouseMove, handleMouseLeave } = useTilt();
-  return (
-    <motion.div
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      transition={{ type: 'spring', stiffness: 300 }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+const RingStat = ({
+	title,
+	value,
+}: {
+	title: string;
+	value: number;
+}) => {
+	const radius = 80;
+
+	const stroke = 15;
+
+	const normalizedRadius =
+		radius - stroke / 2;
+
+	const circumference =
+		normalizedRadius * 2 * Math.PI;
+
+	const strokeDashoffset =
+		circumference -
+		(value / 100) * circumference;
+
+	return (
+		<div
+			className="
+				flex
+				min-h-[260px]
+				flex-col
+				items-center
+				justify-center
+				border-r
+				border-border
+				bg-background
+				px-8
+				py-10
+				last:border-r-0
+			"
+		>
+			<h3
+				className="
+					mb-8
+					text-lg
+					font-semibold
+					tracking-tight
+					text-foreground
+				"
+			>
+				{title}
+			</h3>
+
+			<div className="relative h-44 w-44">
+				<svg
+					height="176"
+					width="176"
+					viewBox="0 0 176 176"
+					className="-rotate-90"
+				>
+					<circle
+						cx="88"
+						cy="88"
+						r={normalizedRadius}
+						fill="transparent"
+						stroke="currentColor"
+						strokeWidth={stroke}
+						className="
+							text-neutral-200
+							dark:text-neutral-800
+						"
+					/>
+
+					<circle
+						cx="88"
+						cy="88"
+						r={normalizedRadius}
+						fill="transparent"
+						stroke="currentColor"
+						strokeWidth={stroke}
+						strokeLinecap="round"
+						strokeDasharray={`${circumference} ${circumference}`}
+						strokeDashoffset={
+							strokeDashoffset
+						}
+						className="
+							text-black
+							dark:text-white
+							transition-all
+							duration-700
+						"
+					/>
+				</svg>
+
+				<div
+					className="
+						absolute
+						inset-0
+						flex
+						flex-col
+						items-center
+						justify-center
+					"
+				>
+					<div
+						className="
+							text-6xl
+							font-semibold
+							leading-none
+							tracking-tight
+							text-foreground
+						"
+					>
+						{value}
+					</div>
+
+					<div
+						className="
+							mt-2
+							text-lg
+							font-medium
+							text-muted-foreground
+						"
+					>
+						/100
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export const DashboardPage = () => {
-  const { user } = useAuthStore();
-  const { data: meetings = [] } = useQuery({ queryKey: ['meetings'], queryFn: api.fetchMeetings });
-  const recentMeetings = meetings.slice(0, 3);
+	const { user } = useAuthStore();
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
+	const { data: meetings = [] } = useQuery({
+		queryKey: ['meetings'],
+		queryFn: meetingsApi.fetchMeetings,
+		staleTime: 30_000,
+	});
 
-  return (
-    <PageTransition>
-      <div className="p-8">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome back, <span className="text-primary">{user?.name || 'User'}</span>
-          </h1>
-          <p className="text-muted-foreground mt-1">Here's what's happening with your meetings today.</p>
-        </header>
+	const liveMeetings = meetings.filter(
+		(meeting) => meeting.status === 'live'
+	);
 
-        <motion.div variants={container} initial="hidden" animate="show">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            <TiltCard className="bg-card rounded-xl p-5 shadow-sm border border-border hover-lift transition-all duration-300">
-              <div className="flex items-center gap-3">
-                <Video className="text-primary" />
-                <div>
-                  <p className="text-2xl font-bold">{meetings.length}</p>
-                  <p className="text-muted-foreground">Total meetings</p>
-                </div>
-              </div>
-            </TiltCard>
-            <TiltCard className="bg-card rounded-xl p-5 shadow-sm border border-border hover-lift transition-all duration-300">
-              <div className="flex items-center gap-3">
-                <CheckSquare className="text-emerald-500" />
-                <div>
-                  <p className="text-2xl font-bold">12</p>
-                  <p className="text-muted-foreground">Action items</p>
-                </div>
-              </div>
-            </TiltCard>
-            <TiltCard className="bg-card rounded-xl p-5 shadow-sm border border-border hover-lift transition-all duration-300">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="text-accent" />
-                <div>
-                  <p className="text-2xl font-bold">40%</p>
-                  <p className="text-muted-foreground">Productivity ↑</p>
-                </div>
-              </div>
-            </TiltCard>
-          </div>
-        </motion.div>
+	const upcomingMeetings = meetings
+		.filter(
+			(meeting) =>
+				meeting.status === 'scheduled'
+		)
+		.slice(0, 4);
 
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold mb-4 text-foreground">Recent meetings</h2>
-          <div className="space-y-3">
-            {recentMeetings.map((m, idx) => (
-              <motion.div
-                key={m.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-              >
-                <Link
-                  to={`/meeting/${m.id}/summary`}
-                  className="block p-4 rounded-xl glass hover-lift transition-all duration-300"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-foreground">{m.title}</span>
-                    <span className="text-sm text-muted-foreground">{new Date(m.date).toLocaleDateString()}</span>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </PageTransition>
-  );
+	const pastMeetings = meetings
+		.filter(
+			(meeting) =>
+				meeting.status === 'recorded' ||
+				meeting.status === 'ended'
+		)
+		.slice(0, 4);
+
+	const engagementScore = Math.min(
+		100,
+		52 +
+			liveMeetings.length * 6 +
+			upcomingMeetings.length * 3
+	);
+
+	const qualityScore = Math.min(
+		100,
+		58 +
+			pastMeetings.length * 5 +
+			meetings.length * 2
+	);
+
+	const fairnessScore = Math.min(
+		100,
+		55 +
+			new Set(
+				meetings.map(
+					(meeting) =>
+						meeting.creator_user_id
+				)
+			).size *
+				4
+	);
+
+	return (
+		<PageTransition>
+			<div
+				className="
+					mx-auto
+					w-full
+					max-w-7xl
+					p-6
+				"
+			>
+				<div className="mb-8">
+					<h1
+						className="
+							text-5xl
+							font-semibold
+							tracking-tight
+							text-foreground
+						"
+					>
+						My Activity
+					</h1>
+
+					<p
+						className="
+							mt-3
+							text-base
+							text-muted-foreground
+						"
+					>
+						Welcome back,{' '}
+						{user?.name || 'User'}.
+					</p>
+				</div>
+
+				<div
+					className="
+						grid
+						overflow-hidden
+						border
+						border-border
+						bg-background
+						md:grid-cols-3
+					"
+				>
+					<RingStat
+						title="Engagement"
+						value={engagementScore}
+					/>
+
+					<RingStat
+						title="Quality"
+						value={qualityScore}
+					/>
+
+					<RingStat
+						title="Fairness"
+						value={fairnessScore}
+					/>
+				</div>
+
+				<div
+					className="
+						mt-10
+						space-y-8
+					"
+				>
+					<section
+						className="
+							glass-card
+							border
+							border-border/40
+							p-6
+						"
+					>
+						<div
+							className="
+								mb-6
+								flex
+								items-center
+								justify-between
+								gap-4
+							"
+						>
+							<div>
+								<h2
+									className="
+										text-2xl
+										font-semibold
+										text-foreground
+									"
+								>
+									Upcoming Meetings
+								</h2>
+
+								<p
+									className="
+										mt-1
+										text-sm
+										text-muted-foreground
+									"
+								>
+									Scheduled sessions ready
+									for your team.
+								</p>
+							</div>
+
+							<Link
+								to="/meetings"
+								className="
+									inline-flex
+									items-center
+									gap-2
+									border
+									border-border/50
+									bg-background/40
+									px-4
+									py-2
+									text-sm
+									font-medium
+									text-foreground
+									backdrop-blur-xl
+									transition-colors
+									hover:bg-accent/30
+								"
+							>
+								Manage
+
+								<ArrowUpRight
+									size={16}
+								/>
+							</Link>
+						</div>
+
+						<div
+							className="
+								grid
+								grid-cols-1
+								gap-5
+								lg:grid-cols-2
+							"
+						>
+							{upcomingMeetings.map(
+								(meeting) => (
+									<MeetingCard
+										key={
+											meeting.id
+										}
+										meeting={
+											meeting
+										}
+										actionLabel={ctaForStatus(
+											meeting.status
+										)}
+										actionTo={
+											meeting.meeting_url
+										}
+									/>
+								)
+							)}
+
+							{upcomingMeetings.length ===
+								0 && (
+								<div
+									className="
+										border
+										border-dashed
+										border-border/50
+										bg-background/40
+										p-6
+										text-sm
+										text-muted-foreground
+										lg:col-span-2
+									"
+								>
+									No upcoming meetings
+									yet.
+								</div>
+							)}
+						</div>
+					</section>
+
+					<section
+						className="
+							glass-card
+							border
+							border-border/40
+							p-6
+						"
+					>
+						<div
+							className="
+								mb-6
+								flex
+								items-center
+								justify-between
+								gap-4
+							"
+						>
+							<div>
+								<h2
+									className="
+										text-2xl
+										font-semibold
+										text-foreground
+									"
+								>
+									Recorded Meetings
+								</h2>
+
+								<p
+									className="
+										mt-1
+										text-sm
+										text-muted-foreground
+									"
+								>
+									Recorded rooms and
+									completed sessions.
+								</p>
+							</div>
+
+							<Link
+								to="/analytics"
+								className="
+									inline-flex
+									items-center
+									gap-2
+									border
+									border-border/50
+									bg-background/40
+									px-4
+									py-2
+									text-sm
+									font-medium
+									text-foreground
+									backdrop-blur-xl
+									transition-colors
+									hover:bg-accent/30
+								"
+							>
+								Analytics
+
+								<ArrowUpRight
+									size={16}
+								/>
+							</Link>
+						</div>
+
+						<div
+							className="
+								grid
+								grid-cols-1
+								gap-5
+								lg:grid-cols-2
+							"
+						>
+							{pastMeetings.map(
+								(meeting) => (
+									<MeetingCard
+										key={
+											meeting.id
+										}
+										meeting={
+											meeting
+										}
+										actionLabel={ctaForStatus(
+											meeting.status
+										)}
+										actionTo={`${meeting.meeting_url}/summary`}
+										tone="recorded"
+									/>
+								)
+							)}
+
+							{pastMeetings.length ===
+								0 && (
+								<div
+									className="
+										border
+										border-dashed
+										border-border/50
+										bg-background/40
+										p-6
+										text-sm
+										text-muted-foreground
+										lg:col-span-2
+									"
+								>
+									Recorded meetings will
+									appear here after a
+									session is ended and
+									saved.
+								</div>
+							)}
+						</div>
+					</section>
+				</div>
+			</div>
+		</PageTransition>
+	);
 };

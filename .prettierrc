@@ -3,10 +3,20 @@
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "all",
-  "printWidth": 80,
+  "printWidth": 200,
   "arrowParens": "always",
   "endOfLine": "lf",
+  "singleAttributePerLine": false,
+  "htmlWhitespaceSensitivity": "ignore",
+  "plugins": ["prettier-plugin-astro"],
+
   "overrides": [
+    {
+      "files": "*.astro",
+      "options": {
+        "parser": "astro"
+      }
+    },
     {
       "files": ["*.yaml", "*.yml", "pnpm-workspace.yaml"],
       "options": {

@@ -1,143 +1,47 @@
 import { NavLink } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  Video,
-  KanbanSquare,
-  BarChart3,
-  Settings,
-  ArrowLeftRight,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
-
-import { useState } from 'react';
+import { LayoutDashboard, Video, KanbanSquare, BarChart3, Settings, ArrowLeftRight } from 'lucide-react';
+import type { Dispatch, SetStateAction } from 'react';
 
 import { useAuthStore } from '../store/authStore';
 import { DarkModeToggle } from './DarkModeToggle';
 
-export const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+interface SidebarProps {
+  collapsed: boolean;
+  setCollapsed: Dispatch<SetStateAction<boolean>>;
+}
 
-  const switchAccount = useAuthStore((s) => s.switchAccount);
-  const user = useAuthStore((s) => s.user);
+export const Sidebar = ({ collapsed }: SidebarProps) => {
+  const switchAccount = useAuthStore((state) => state.switchAccount);
+  const user = useAuthStore((state) => state.user);
 
   const navSections = [
     {
       title: 'Workspace',
       items: [
-        {
-          path: '/dashboard',
-          icon: LayoutDashboard,
-          label: 'Dashboard',
-        },
-        {
-          path: '/meetings',
-          icon: Video,
-          label: 'Meetings',
-        },
-        {
-          path: '/kanban',
-          icon: KanbanSquare,
-          label: 'Kanban',
-        },
+        { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+        { path: '/meetings', icon: Video, label: 'Meetings' },
+        { path: '/kanban', icon: KanbanSquare, label: 'Kanban' },
       ],
     },
     {
       title: 'Management',
       items: [
-        {
-          path: '/analytics',
-          icon: BarChart3,
-          label: 'Analytics',
-        },
-        {
-          path: '/settings',
-          icon: Settings,
-          label: 'Settings',
-        },
+        { path: '/analytics', icon: BarChart3, label: 'Analytics' },
+        { path: '/settings', icon: Settings, label: 'Settings' },
       ],
     },
   ];
 
   return (
-    <aside
-      className={`
-        glass border-r border-border/50
-        sticky top-0 z-20 h-screen
-        transition-all duration-300 ease-in-out
-        flex flex-col justify-between
-        ${collapsed ? 'w-20' : 'w-72'}
-      `}
-    >
-      {/* TOP */}
-      <div>
-        {/* LOGO */}
-        <div
-          className={`
-            flex items-center
-            px-4 pt-6 pb-4
-            ${collapsed ? 'justify-center' : 'justify-between'}
-          `}
-        >
-          {!collapsed ? (
-            <>
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
-                  <span className="font-bold text-sm">IM</span>
-                </div>
+    <aside className={`relative z-20 flex h-[calc(100vh-5rem)] shrink-0 flex-col justify-between border-r border-border/50 bg-background/65 backdrop-blur-2xl transition-[width] duration-300 ease-in-out ${collapsed ? 'w-20' : 'w-64'}`}>
+      <div className="flex-1 overflow-y-auto premium-scrollbar px-3 py-5">
 
-                <div>
-                  <p className="font-semibold text-sm tracking-tight">
-                    IntellMeet
-                  </p>
 
-                  <p className="text-xs text-muted-foreground">
-                    Enterprise Workspace
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setCollapsed(true)}
-                className="
-                  p-2 rounded-xl
-                  text-muted-foreground
-                  hover:bg-accent
-                  hover:text-accent-foreground
-                  transition-all
-                "
-              >
-                <ChevronLeft size={18} />
-              </button>
-            </>
-          ) : (
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-11 h-11 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
-                <span className="font-bold text-sm">IM</span>
-              </div>
-
-              <button
-                onClick={() => setCollapsed(false)}
-                className="
-                  p-2 rounded-xl
-                  text-muted-foreground
-                  hover:bg-accent
-                  hover:text-accent-foreground
-                  transition-all
-                "
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* NAVIGATION */}
-        <div className="px-3 mt-2 flex flex-col gap-6">
+        <div className="flex flex-col gap-7">
           {navSections.map((section) => (
             <div key={section.title}>
               {!collapsed && (
-                <p className="px-3 mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <p className="mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                   {section.title}
                 </p>
               )}
@@ -149,31 +53,17 @@ export const Sidebar = () => {
                     to={item.path}
                     title={collapsed ? item.label : ''}
                     className={({ isActive }) =>
-                      `
-                        group flex items-center
-                        rounded-2xl
-                        transition-all duration-200
-                        hover-lift
-                        ${
-                          collapsed
-                            ? 'justify-center px-0 py-3'
-                            : 'gap-3 px-4 py-3'
-                        }
-                        ${
-                          isActive
-                            ? 'bg-primary text-primary-foreground shadow-md'
-                            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                        }
-                      `
+                      [
+                        'group flex items-center rounded-2xl transition-all duration-200',
+                        collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3',
+                        isActive
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'text-muted-foreground hover:bg-accent/60 hover:text-accent-foreground',
+                      ].join(' ')
                     }
                   >
-                    <item.icon size={21} strokeWidth={1.8} />
-
-                    {!collapsed && (
-                      <span className="text-sm font-medium">
-                        {item.label}
-                      </span>
-                    )}
+                    <item.icon size={19} strokeWidth={1.9} className="shrink-0" />
+                    {!collapsed && <span className="truncate text-sm font-medium">{item.label}</span>}
                   </NavLink>
                 ))}
               </nav>
@@ -182,59 +72,29 @@ export const Sidebar = () => {
         </div>
       </div>
 
-      {/* BOTTOM */}
-      <div className="px-3 pb-5 flex flex-col gap-4">
-        {/* ACTIONS */}
-        <div
-          className={`
-            flex items-center
-            ${collapsed ? 'flex-col gap-3' : 'justify-between'}
-          `}
-        >
+      <div className="border-t border-border/50 p-3">
+        <div className={`flex items-center ${collapsed ? 'flex-col gap-3' : 'justify-between gap-3'}`}>
           <DarkModeToggle />
 
           <button
             onClick={switchAccount}
             title="Switch account"
-            className="
-              p-2 rounded-xl
-              text-muted-foreground
-              hover:bg-destructive/10
-              hover:text-destructive
-              transition-all duration-200
-              hover:scale-105
-            "
+            className="flex h-10 w-10 items-center justify-center text-muted-foreground transition-colors duration-200 hover:text-foreground"
           >
-            <ArrowLeftRight size={21} strokeWidth={1.7} />
+            <ArrowLeftRight size={18} strokeWidth={1.8} />
           </button>
         </div>
 
-        {/* USER */}
         {user && (
           <NavLink
             to="/settings/my-details"
-            className={`
-              rounded-2xl border border-border/60
-              bg-background/40
-              transition-all duration-200
-              hover:border-primary/30
-              hover:bg-accent/40
-              ${
-                collapsed
-                  ? 'p-2 flex justify-center'
-                  : 'p-3 flex items-center gap-3'
-              }
-            `}
+            className={`mt-4 border border-border/50 bg-card/60 backdrop-blur-xl transition-colors duration-200 hover:border-border/70 hover:bg-background/80 ${collapsed ? 'flex justify-center p-2' : 'flex items-center gap-3 p-3'}`}
           >
-            <div className="w-11 h-11 rounded-xl overflow-hidden border border-border shadow-sm shrink-0">
+            <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-border/50">
               {user.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.name}
-                  className="w-full h-full object-cover"
-                />
+                <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
+                <div className="flex h-full w-full items-center justify-center bg-primary/10 text-xs font-bold uppercase text-primary">
                   {user.name
                     .split(' ')
                     .map((n) => n[0])
@@ -246,13 +106,8 @@ export const Sidebar = () => {
 
             {!collapsed && (
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">
-                  {user.name}
-                </p>
-
-                <p className="truncate text-xs text-muted-foreground">
-                  Enterprise Member
-                </p>
+                <p className="truncate text-sm font-medium">{user.name}</p>
+                <p className="truncate text-xs text-muted-foreground">Enterprise Member</p>
               </div>
             )}
           </NavLink>
