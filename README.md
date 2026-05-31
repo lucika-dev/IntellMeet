@@ -131,6 +131,8 @@ pnpm exec turbo login
 
 This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
 
+For CI/CD and shared team caching, set `TURBO_TEAM` and `TURBO_TOKEN` in your deployment environment or GitHub Actions secrets. Without those values, Turbo falls back to local cache only.
+
 Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
 
 With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
