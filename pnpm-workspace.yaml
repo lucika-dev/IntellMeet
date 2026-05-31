@@ -21,7 +21,7 @@ catalog:
 
   "astro": 6.4.2
   "@astrojs/react": 5.0.6  
-  "@astrojs/node": 9.5.0
+  "@astrojs/node": 10.1.2
 
   "tailwindcss": 4.3.0
   "@tailwindcss/postcss": 4.3.0
