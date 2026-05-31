@@ -96,9 +96,9 @@ catalog:
   "@types/jsonwebtoken": 9.0.10
   "@types/multer": 2.1.0
 
-onlyBuiltDependencies:
-  - bcrypt
-  - esbuild
-  - sharp
-  - unrs-resolver
-  - msw
+allowBuilds:
+  bcrypt: true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  msw: true
