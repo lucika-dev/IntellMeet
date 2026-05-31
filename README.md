@@ -1,161 +1,231 @@
-# Turborepo starter
+# wraithorg
 
-This Turborepo starter is maintained by the Turborepo core team.
+wraithorg is a unified platform ecosystem focused on authentication infrastructure, intelligent systems, realtime collaboration, developer tooling, and scalable application architecture.
 
-## Using this example
+The repository powers both the Wraith platform and the underlying infrastructure exposed to developers through reusable services, SDKs, UI systems, and platform APIs.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## Platform Architecture
+
+The workspace is organized into three primary layers:
+
+```txt id="q5m2vp"
+apps/
+packages/
+services/
 ```
 
-## What's inside?
+### apps
 
-This Turborepo includes the following packages/apps:
+Applications are separated into two categories:
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```txt id="r8v1xn"
+apps/
+  dashboard/
+  landing/
 ```
 
-Without global `turbo`, use your package manager:
+#### `apps/landing`
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+Public-facing landing platforms built with Astro.
+
+These applications focus on:
+
+* SEO
+* performance
+* static rendering
+* marketing systems
+* product onboarding
+
+#### `apps/dashboard`
+
+Authenticated application platforms built with Vite + React.
+
+These applications handle:
+
+* realtime systems
+* authenticated user flows
+* platform management
+* dashboards
+* collaborative environments
+
+---
+
+## Platform Services
+
+wraithorg is designed as a platform-first ecosystem where core infrastructure is exposed through reusable packages and managed backend systems.
+
+Developers integrate services through SDKs while infrastructure, storage, authentication, and synchronization remain managed by the platform.
+
+---
+
+## Wraith Auth
+
+`wraith-auth` is a centralized authentication infrastructure designed as a plug-and-use identity platform.
+
+The system is intended to provide:
+
+* hosted authentication flows
+* account management
+* OAuth providers
+* callback handling
+* session management
+* profile synchronization
+* secure backend-managed identity storage
+
+Authentication flows are designed around hosted routes similar to:
+
+```txt id="u4p7zr"
+https://auth.wraithorg.com/...
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Applications integrating Wraith Auth will be able to:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+* launch authentication flows through SDK functions
+* receive automatic callback handling
+* synchronize authenticated sessions
+* manage users without building backend auth infrastructure
 
-```sh
-turbo build --filter=docs
+The goal is to expose authentication through minimal integration APIs such as:
+
+```ts id="h2x9wc"
+login()
+signup()
+logout()
+deleteAccount()
+updateProfile()
 ```
 
-Without global `turbo`:
+while backend infrastructure, storage, and session management remain fully managed by Wraith infrastructure.
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+---
+
+## Wraith Themes
+
+`wraith-themes` is being designed as a centralized theme synchronization platform.
+
+Instead of distributing static theme files, themes are intended to be:
+
+* account-linked
+* remotely synchronized
+* dynamically resolved
+* shared across applications
+
+Applications integrating:
+
+* Wraith Auth
+* Wraith Themes
+* Theme Picker components
+
+will be able to synchronize user theme preferences automatically across supported platforms.
+
+---
+
+## Wraith UI
+
+`wraith-ui` is a reusable UI platform inspired by composable system architectures.
+
+The goal is to provide:
+
+* production-ready components
+* complete reusable sections
+* platform-aware generators
+* installation tooling
+* design-consistent systems
+
+The platform is intended to support installation flows similar to:
+
+```bash id="d7m3kr"
+pnpm add wraith-ui
 ```
 
-### Develop
+with tooling capable of:
 
-To develop all apps and packages, run the following command:
+* detecting project environments
+* adapting to platform configuration
+* generating compatible components
+* integrating automatically into existing projects
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Supported environments may include:
 
-```sh
-cd my-turborepo
+* React
+* Vite
+* Next.js
+* Astro
+* Node-based ecosystems
+
+---
+
+## Engineering Principles
+
+The platform is built around:
+
+* modular infrastructure
+* centralized platform services
+* strongly typed systems
+* reusable architecture
+* secure-by-default design
+* scalable backend systems
+* realtime-first applications
+* reproducible builds
+* developer-focused workflows
+
+---
+
+## Technology Stack
+
+| Layer            | Technologies                |
+| ---------------- | --------------------------- |
+| Frontend         | React, Astro, Vite          |
+| Backend          | Node.js, Express            |
+| Styling          | Tailwind CSS                |
+| State Management | Zustand, React Query        |
+| Realtime         | Socket.IO                   |
+| Infrastructure   | Supabase                    |
+| Tooling          | Turborepo, pnpm, TypeScript |
+
+---
+
+## Development
+
+Install dependencies:
+
+```bash id="p4v8qt"
+pnpm install
+```
+
+Start development:
+
+```bash id="m9x2wc"
 turbo dev
 ```
 
-Without global `turbo`, use your package manager:
+Build the workspace:
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+```bash id="k6n1zr"
+turbo build
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Run validation:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
+```bash id="r3p7vx"
+turbo lint
+turbo check-types
 ```
 
-Without global `turbo`:
+---
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## Security
 
-### Remote Caching
+Security, authentication integrity, infrastructure protection, and controlled platform access are core requirements across the ecosystem.
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+See:
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+* `SECURITY.md`
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+---
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+## Status
 
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-For CI/CD and shared team caching, set `TURBO_TEAM` and `TURBO_TOKEN` in your deployment environment or GitHub Actions secrets. Without those values, Turbo falls back to local cache only.
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+Active development.
