@@ -32,6 +32,8 @@ interface SidebarProps {
 
   onOpenReactions?: () => void;
 
+  onToggleScreenShare?: () => void;
+
   onOpenSettings?: () => void;
 }
 
@@ -51,6 +53,8 @@ export const Sidebar = ({
   onOpenParticipants,
 
   onOpenReactions,
+
+  onToggleScreenShare,
 
   onOpenSettings,
 }: SidebarProps) => {
@@ -299,6 +303,9 @@ export const Sidebar = ({
             }
             onOpenReactions={
               onOpenReactions
+            }
+            onToggleScreenShare={
+              onToggleScreenShare
             }
             onOpenSettings={
               onOpenSettings

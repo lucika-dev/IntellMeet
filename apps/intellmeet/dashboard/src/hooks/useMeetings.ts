@@ -159,16 +159,6 @@ export const useMeetings = (
             ascending: false,
           });
 
-      console.log(
-        'meetingsData',
-        data,
-      );
-
-      console.log(
-        'meetingsError',
-        error,
-      );
-
       if (error) {
         throw error;
       }
@@ -275,16 +265,6 @@ export const useRecordedMeetings = (
             ascending: false,
           });
 
-      console.log(
-        'recordedMeetingsData',
-        data,
-      );
-
-      console.log(
-        'recordedMeetingsError',
-        error,
-      );
-
       if (error) {
         throw error;
       }
@@ -384,16 +364,6 @@ export const useLiveMeetings = (
           .order('created_at', {
             ascending: false,
           });
-
-      console.log(
-        'liveMeetingsData',
-        data,
-      );
-
-      console.log(
-        'liveMeetingsError',
-        error,
-      );
 
       if (error) {
         throw error;

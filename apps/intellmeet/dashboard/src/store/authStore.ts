@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { buildAuthLoginUrl, clearWraithAuthStorage, supabase } from '@wraith/auth/client';
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 
 const STORAGE_KEY = 'intellmeet-auth-token';
 const APP_ORIGIN = (import.meta.env.VITE_APP_ORIGIN as string | undefined) || 'http://localhost:3000';
@@ -26,7 +26,7 @@ interface AuthState {
     avatarUrl?: string | null;
   } | null;
   loading: boolean;
-  setUser: (user: any) => void;
+  setUser: (user: User | null) => void;
   switchAccount: () => Promise<void>;
   checkSession: () => Promise<void>;
 }

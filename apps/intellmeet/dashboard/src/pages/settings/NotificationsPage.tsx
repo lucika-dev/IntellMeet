@@ -61,7 +61,19 @@ export const NotificationsPage = () => {
   );
 };
 
-const NotificationItem = ({ title, description, enabled, onToggle }: any) => (
+interface NotificationItemProps {
+  title: string;
+  description: string;
+  enabled: boolean;
+  onToggle: () => void;
+}
+
+const NotificationItem = ({
+  title,
+  description,
+  enabled,
+  onToggle,
+}: NotificationItemProps) => (
   <div className="flex items-center justify-between p-6 hover:bg-muted/30 transition-colors group">
     <div className="space-y-1">
       <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">{title}</h3>

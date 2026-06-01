@@ -37,7 +37,7 @@ export const MemberFormDialog = () => {
     }
   }, [editMember, reset]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Omit<TeamMember, 'id'>) => {
     const initials = data.name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
     const memberData = { ...data, avatarInitials: initials };
 

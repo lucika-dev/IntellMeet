@@ -5,11 +5,17 @@ import {
   VideoOff,
 } from 'lucide-react';
 
+import type { LiveKitParticipantTile } from '../../hooks/useLiveKitMeeting';
 import { useMeetingStore } from '../../store/meetingStore';
 
-export const ParticipantsPanel = () => {
+interface ParticipantsPanelProps {
+  participants: LiveKitParticipantTile[];
+}
+
+export const ParticipantsPanel = ({
+  participants,
+}: ParticipantsPanelProps) => {
   const {
-    participants,
     pinnedParticipantId,
     setPinnedParticipant,
   } = useMeetingStore();
@@ -95,11 +101,20 @@ export const ParticipantsPanel = () => {
                         shrink-0
                         items-center
                         justify-center
+                        overflow-hidden
                         bg-muted
                         text-sm font-semibold
                       "
                     >
-                      {participant.name[0]}
+                      {participant.avatarUrl ? (
+                        <img
+                          src={participant.avatarUrl}
+                          alt={participant.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        participant.name[0]
+                      )}
                     </div>
 
                     <div className="min-w-0">
@@ -120,7 +135,9 @@ export const ParticipantsPanel = () => {
                       >
                         {isPinned
                           ? 'Pinned'
-                          : 'Participant'}
+                          : participant.isLocal
+                            ? 'You'
+                            : 'Participant'}
                       </div>
                     </div>
                   </div>
@@ -130,13 +147,13 @@ export const ParticipantsPanel = () => {
                       flex items-center gap-2
                     "
                   >
-                    {participant.is_muted ? (
+                    {participant.isMuted ? (
                       <MicOff className="size-4" />
                     ) : (
                       <Mic className="size-4" />
                     )}
 
-                    {participant.is_camera_on ? (
+                    {participant.isCameraOn ? (
                       <Video className="size-4" />
                     ) : (
                       <VideoOff className="size-4" />

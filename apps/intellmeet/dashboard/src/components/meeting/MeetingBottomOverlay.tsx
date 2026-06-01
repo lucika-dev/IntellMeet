@@ -1,17 +1,26 @@
 import { MeetingControls } from './MeetingControls';
 
-import { useMeetingStore } from '../../store/meetingStore';
+interface MeetingBottomOverlayProps {
+  micEnabled: boolean;
+  cameraEnabled: boolean;
+  onToggleMic: () => void;
+  onToggleCamera: () => void;
+  onOpenChat: () => void;
+  onOpenParticipants: () => void;
+  onOpenReactions: () => void;
+  onToggleScreenShare: () => void;
+}
 
-export const MeetingBottomOverlay = () => {
-  const {
-    micEnabled,
-    cameraEnabled,
-    toggleMic,
-    toggleCamera,
-    toggleChat,
-    toggleReactions,
-  } = useMeetingStore();
-
+export const MeetingBottomOverlay = ({
+  micEnabled,
+  cameraEnabled,
+  onToggleMic,
+  onToggleCamera,
+  onOpenChat,
+  onOpenParticipants,
+  onOpenReactions,
+  onToggleScreenShare,
+}: MeetingBottomOverlayProps) => {
   return (
     <div
       className="
@@ -34,18 +43,21 @@ export const MeetingBottomOverlay = () => {
             cameraEnabled
           }
           onToggleMic={
-            toggleMic
+            onToggleMic
           }
           onToggleCamera={
-            toggleCamera
+            onToggleCamera
           }
           onOpenChat={
-            toggleChat
+            onOpenChat
+          }
+          onOpenParticipants={
+            onOpenParticipants
           }
           onOpenReactions={
-            toggleReactions
+            onOpenReactions
           }
-          onOpenSettings={() => {}}
+          onToggleScreenShare={onToggleScreenShare}
         />
       </div>
     </div>

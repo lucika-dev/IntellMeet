@@ -4,11 +4,16 @@ import {
   Video,
   VideoOff,
 } from 'lucide-react';
+import type {
+  LocalVideoTrack,
+  RemoteVideoTrack,
+} from 'livekit-client';
 
-import type { MeetingParticipant } from '../../store/meetingStore';
+import type { LiveKitParticipantTile } from '../../hooks/useLiveKitMeeting';
+import { LiveKitVideo } from '../../components/meeting/LiveKitVideo';
 
 interface ParticipantTileProps {
-  participant: MeetingParticipant;
+  participant: LiveKitParticipantTile;
 
   pinned?: boolean;
 }
@@ -18,6 +23,10 @@ export const ParticipantTile = ({
 
   pinned = false,
 }: ParticipantTileProps) => {
+  const videoTrack =
+    participant.screenPublication?.videoTrack ??
+    participant.cameraPublication?.videoTrack;
+
   return (
     <div
       className={`
@@ -40,16 +49,16 @@ export const ParticipantTile = ({
           bg-muted
         "
       >
-        {participant.avatar_url ? (
+        {videoTrack ? (
+          <LiveKitVideo
+            track={videoTrack as LocalVideoTrack | RemoteVideoTrack}
+            muted={participant.isLocal}
+          />
+        ) : participant.avatarUrl ? (
           <img
-            src={
-              participant.avatar_url
-            }
+            src={participant.avatarUrl}
             alt={participant.name}
-            className="
-              h-full w-full
-              object-cover
-            "
+            className="h-full w-full object-cover"
           />
         ) : (
           <div
@@ -91,13 +100,13 @@ export const ParticipantTile = ({
             flex items-center gap-2
           "
         >
-          {participant.is_muted ? (
+          {participant.isMuted ? (
             <MicOff className="size-4" />
           ) : (
             <Mic className="size-4" />
           )}
 
-          {participant.is_camera_on ? (
+          {participant.isCameraOn ? (
             <Video className="size-4" />
           ) : (
             <VideoOff className="size-4" />

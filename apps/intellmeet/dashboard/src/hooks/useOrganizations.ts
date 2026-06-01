@@ -36,56 +36,7 @@ export const useOrganizations = () => {
     enabled: !!userId,
 
     queryFn: async () => {
-      console.log(
-        'zustandUserId',
-        userId,
-      );
-
-      console.log(
-        'SUPABASE_URL',
-        import.meta.env
-          .VITE_SUPABASE_URL,
-      );
-
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      console.log(
-        'supabaseSession',
-        session,
-      );
-
-      console.log(
-        'sessionError',
-        sessionError,
-      );
-
-      const {
-        data: allMembers,
-        error: allMembersError,
-      } = await supabase
-        .from(
-          'organization_members',
-        )
-        .select('*');
-
-      console.log(
-        'ALL_MEMBERS',
-        allMembers,
-      );
-
-      console.log(
-        'ALL_MEMBERS_ERROR',
-        allMembersError,
-      );
-
       if (!userId) {
-        console.log(
-          'No zustand user id found',
-        );
-
         return [];
       }
 
@@ -102,25 +53,11 @@ export const useOrganizations = () => {
         `)
         .eq('user_id', userId);
 
-      console.log(
-        'memberships',
-        memberships,
-      );
-
-      console.log(
-        'membershipsError',
-        membershipsError,
-      );
-
       if (membershipsError) {
         throw membershipsError;
       }
 
       if (!memberships?.length) {
-        console.log(
-          'No organization memberships found',
-        );
-
         return [];
       }
 
@@ -129,11 +66,6 @@ export const useOrganizations = () => {
           (membership) =>
             membership.organization_id,
         );
-
-      console.log(
-        'organizationIds',
-        organizationIds,
-      );
 
       const {
         data: organizationsData,
@@ -150,16 +82,6 @@ export const useOrganizations = () => {
           created_at
         `)
         .in('id', organizationIds);
-
-      console.log(
-        'organizationsData',
-        organizationsData,
-      );
-
-      console.log(
-        'organizationsError',
-        organizationsError,
-      );
 
       if (organizationsError) {
         throw organizationsError;
@@ -189,11 +111,6 @@ export const useOrganizations = () => {
               organization.id,
             ) ?? 'member',
         })) ?? [];
-
-      console.log(
-        'finalOrganizations',
-        finalOrganizations,
-      );
 
       return finalOrganizations;
     },

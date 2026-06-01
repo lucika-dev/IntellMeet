@@ -31,6 +31,30 @@ interface TopbarProps {
   ) => void;
 }
 
+const getInitialTheme = () => {
+  if (typeof window === 'undefined') {
+    return 'light';
+  }
+
+  const storedTheme =
+    localStorage.getItem(
+      'theme',
+    );
+
+  if (
+    storedTheme === 'dark' ||
+    storedTheme === 'light'
+  ) {
+    return storedTheme;
+  }
+
+  return window.matchMedia(
+    '(prefers-color-scheme: dark)',
+  ).matches
+    ? 'dark'
+    : 'light';
+};
+
 export const Topbar = ({
   collapsed,
   setCollapsed,
@@ -41,7 +65,7 @@ export const Topbar = ({
   const [theme, setTheme] =
     useState<
       'light' | 'dark'
-    >('light');
+    >(getInitialTheme);
 
   const {
     data: organizations = [],
@@ -75,36 +99,12 @@ export const Topbar = ({
     );
 
   useEffect(() => {
-    const storedTheme =
-      localStorage.getItem(
-        'theme',
-      );
-
-    const systemTheme =
-      window.matchMedia(
-        '(prefers-color-scheme: dark)',
-      ).matches
-        ? 'dark'
-        : 'light';
-
-    const resolvedTheme =
-      storedTheme ===
-        'dark' ||
-      storedTheme ===
-        'light'
-        ? storedTheme
-        : systemTheme;
-
-    setTheme(
-      resolvedTheme,
-    );
-
     document.documentElement.classList.toggle(
       'dark',
-      resolvedTheme ===
+      theme ===
         'dark',
     );
-  }, []);
+  }, [theme]);
 
   const toggleTheme = () => {
     const nextTheme =

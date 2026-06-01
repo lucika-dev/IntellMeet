@@ -31,6 +31,7 @@
     "mongoose": "catalog:",
     "morgan": "catalog:",
     "multer": "catalog:",
+    "livekit-server-sdk": "catalog:",
     "socket.io": "catalog:",
     "zod": "catalog:"
   },

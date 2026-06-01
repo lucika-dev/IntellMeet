@@ -1,14 +1,22 @@
+import type {
+  LocalVideoTrack,
+  RemoteVideoTrack,
+} from 'livekit-client';
+
+import { LiveKitVideo } from '../../components/meeting/LiveKitVideo';
+import type { LiveKitParticipantTile } from '../../hooks/useLiveKitMeeting';
+
 import { ParticipantTile } from './ParticipantTile';
 
-import type { MeetingParticipant } from '../../store/meetingStore';
-
 interface ScreenShareViewProps {
-  presenter: MeetingParticipant;
+  presenter: LiveKitParticipantTile;
 }
 
 export const ScreenShareView = ({
   presenter,
 }: ScreenShareViewProps) => {
+  const screenTrack = presenter.screenPublication?.videoTrack;
+
   return (
     <div
       className="
@@ -20,36 +28,42 @@ export const ScreenShareView = ({
       <div
         className="
           absolute inset-0
-          flex items-center
-          justify-center
+          overflow-hidden
           border border-border
           bg-card
         "
       >
-        <div
-          className="
-            flex flex-col
-            items-center gap-4
-          "
-        >
+        {screenTrack ? (
+          <LiveKitVideo
+            track={screenTrack as LocalVideoTrack | RemoteVideoTrack}
+            muted={presenter.isLocal}
+          />
+        ) : (
           <div
             className="
-              text-2xl font-semibold
+              flex h-full flex-col
+              items-center justify-center
+              gap-3 text-center
             "
           >
-            Screen Sharing
-          </div>
+            <div
+              className="
+                text-2xl font-semibold
+              "
+            >
+              Screen Sharing
+            </div>
 
-          <div
-            className="
-              text-sm
-              text-muted-foreground
-            "
-          >
-            Shared content stream
-            will render here
+            <div
+              className="
+                text-sm
+                text-muted-foreground
+              "
+            >
+              Waiting for shared content
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div

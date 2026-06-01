@@ -24,6 +24,9 @@ const isExternalHref = (href: string) => /^https?:\/\//.test(href);
 const firstRelation = <T,>(value: T | T[] | null | undefined) =>
   Array.isArray(value) ? value[0] ?? null : value ?? null;
 
+const getStringValue = (value: unknown) =>
+  typeof value === 'string' ? value : null;
+
 export const MeetingCard = ({
   meeting,
   variant,
@@ -49,7 +52,7 @@ export const MeetingCard = ({
 
   const scheduledLabel = formatDateTime(
     'scheduled_for' in meeting
-      ? meeting.scheduled_for
+      ? getStringValue(meeting.scheduled_for)
       : isLegacyMeeting
         ? meeting.scheduled_time
         : meeting.created_at,

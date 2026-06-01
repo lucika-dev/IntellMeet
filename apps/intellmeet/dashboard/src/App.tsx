@@ -13,6 +13,7 @@ import { MeetingsPage } from './pages/MeetingsPage.tsx';
 import { KanbanBoardPage } from './pages/KanbanBoardPage.tsx';
 import { AnalyticsPage } from './pages/AnalyticsPage.tsx';
 import { TeamManagementPage } from './pages/TeamManagementPage.tsx';
+import { FriendsPage } from './pages/FriendsPage.tsx';
 import { MeetingRoomPage } from './pages/MeetingRoomPage.tsx';
 import { MeetingSummaryPage } from './pages/MeetingSummaryPage.tsx';
 import { MeetingPage } from './pages/meeting/MeetingPage';
@@ -151,6 +152,11 @@ function App() {
             <Route
               path="/kanban"
               element={<KanbanBoardPage />}
+            />
+
+            <Route
+              path="/friends"
+              element={<FriendsPage />}
             />
 
             <Route

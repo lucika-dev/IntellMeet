@@ -2,6 +2,7 @@ import {
   MessageSquare,
   Mic,
   MicOff,
+  MonitorUp,
   Settings,
   SmilePlus,
   Users,
@@ -28,6 +29,8 @@ interface MeetingControlsProps {
 
   onOpenReactions?: () => void;
 
+  onToggleScreenShare?: () => void;
+
   onOpenSettings?: () => void;
 }
 
@@ -47,6 +50,8 @@ export const MeetingControls = ({
   onOpenParticipants,
 
   onOpenReactions,
+
+  onToggleScreenShare,
 
   onOpenSettings,
 }: MeetingControlsProps) => {
@@ -88,6 +93,13 @@ export const MeetingControls = ({
 
       onClick:
         onOpenReactions,
+    },
+
+    {
+      icon: MonitorUp,
+
+      onClick:
+        onToggleScreenShare,
     },
 
     {

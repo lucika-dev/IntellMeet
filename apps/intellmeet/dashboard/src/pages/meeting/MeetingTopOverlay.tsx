@@ -15,6 +15,10 @@ interface MeetingTopOverlayProps {
   duration?: string;
 
   isHost?: boolean;
+
+  onLeave?: () => void;
+
+  onEnd?: () => void;
 }
 
 export const MeetingTopOverlay = ({
@@ -23,12 +27,16 @@ export const MeetingTopOverlay = ({
   duration = '00:00:00',
 
   isHost = false,
+
+  onLeave,
+
+  onEnd,
 }: MeetingTopOverlayProps) => {
   const navigate =
     useNavigate();
 
   const handleLeaveMeeting =
-    () => {
+    async () => {
       if (isHost) {
         const shouldEnd =
           window.confirm(
@@ -38,7 +46,15 @@ export const MeetingTopOverlay = ({
         if (!shouldEnd) {
           return;
         }
+
+        await onEnd?.();
+
+        navigate('/dashboard');
+
+        return;
       }
+
+      await onLeave?.();
 
       navigate('/dashboard');
     };
@@ -131,7 +147,7 @@ export const MeetingTopOverlay = ({
             handleLeaveMeeting
           }
           className="
-            h-11 gap-2 bg-red-600 rounded-md
+            h-11 gap-2
           "
         >
           <PhoneOff className="size-4" />

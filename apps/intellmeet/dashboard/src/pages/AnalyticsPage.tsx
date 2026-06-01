@@ -1,181 +1,190 @@
-import { useQuery } from '@tanstack/react-query';
-import { api } from '../api/mockApi';
-import { XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { motion } from 'framer-motion';
-import { TrendingUp, Clock, CheckCircle, Zap } from 'lucide-react';
+import { useMemo } from 'react';
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { CalendarDays, Clock, Radio, Video } from 'lucide-react';
+
 import { PageTransition } from '../components/PageTransition';
+import { useMeetings, useRecordedMeetings } from '../hooks/useMeetings';
+import { useWorkspaceSelection } from '../hooks/useWorkspaceSelection';
 
-export const AnalyticsPage = () => {
-  const { data: meetings = [] } = useQuery({ queryKey: ['meetings'], queryFn: api.fetchMeetings });
+const parseDurationMinutes = (value: string | null) => {
+  if (!value) {
+    return 0;
+  }
 
-  const chartData =
-    meetings.length > 0
-      ? meetings.map((m) => ({ name: new Date(m.date).toLocaleDateString(), duration: m.duration }))
-      : [{ name: 'No data', duration: 0 }];
+  const numeric = Number.parseFloat(value);
 
-  const completionData = [
-    { name: 'Completed', value: 68, color: 'hsl(var(--primary))' },
-    { name: 'Pending', value: 32, color: 'hsl(var(--muted))' },
-  ];
+  return Number.isFinite(numeric) ? numeric : 0;
+};
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
+const StatCard = ({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon: typeof CalendarDays;
+}) => {
   return (
-    <PageTransition>
-      <div className="p-4 md:p-8">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            Analytics & Insights
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            AI‑powered productivity metrics for your team
+    <div className="border border-border bg-card p-5">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm text-muted-foreground">
+            {label}
+          </p>
+
+          <p className="mt-2 text-3xl font-semibold text-foreground">
+            {value}
           </p>
         </div>
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="space-y-8"
-        >
-          <motion.div variants={item} className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition">
-            <div className="flex items-center gap-2 mb-6">
-              <Clock size={20} className="text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">Meeting duration trend</h2>
-            </div>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="hsl(var(--muted-foreground))" 
+        <div className="flex size-11 items-center justify-center bg-accent text-accent-foreground">
+          <Icon className="size-5" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const AnalyticsPage = () => {
+  const { selectedOrganizationId } = useWorkspaceSelection();
+  const meetingsQuery = useMeetings(selectedOrganizationId);
+  const recordingsQuery = useRecordedMeetings(selectedOrganizationId);
+
+  const meetings = useMemo(
+    () => meetingsQuery.data ?? [],
+    [meetingsQuery.data],
+  );
+  const recordings = useMemo(
+    () => recordingsQuery.data ?? [],
+    [recordingsQuery.data],
+  );
+
+  const chartData = useMemo(() => {
+    const counts = new Map<string, number>();
+
+    meetings.forEach((meeting) => {
+      const key = new Date(meeting.created_at).toLocaleDateString();
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    });
+
+    return Array.from(counts.entries()).map(([name, count]) => ({
+      name,
+      count,
+    }));
+  }, [meetings]);
+
+  const liveMeetings = meetings.filter(
+    (meeting) => meeting.status === 'live',
+  ).length;
+  const recordedMinutes = recordings.reduce(
+    (total, recording) =>
+      total + parseDurationMinutes(recording.duration),
+    0,
+  );
+
+  return (
+    <PageTransition>
+      <div className="flex h-full min-h-0 flex-col gap-6 overflow-y-auto p-4 md:p-8">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+            Analytics
+          </h1>
+
+          <p className="mt-1 text-muted-foreground">
+            Workspace activity from stored meetings and recordings
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            label="Meetings"
+            value={String(meetings.length)}
+            icon={CalendarDays}
+          />
+
+          <StatCard
+            label="Live now"
+            value={String(liveMeetings)}
+            icon={Radio}
+          />
+
+          <StatCard
+            label="Recordings"
+            value={String(recordings.length)}
+            icon={Video}
+          />
+
+          <StatCard
+            label="Recorded minutes"
+            value={String(Math.round(recordedMinutes))}
+            icon={Clock}
+          />
+        </div>
+
+        <section className="min-h-[360px] border border-border bg-card p-5">
+          <div className="mb-5">
+            <h2 className="text-lg font-semibold text-foreground">
+              Meetings by day
+            </h2>
+
+            <p className="text-sm text-muted-foreground">
+              Based on meetings in the selected organization
+            </p>
+          </div>
+
+          {chartData.length ? (
+            <div className="h-[280px]">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+                <BarChart data={chartData}>
+                  <XAxis
+                    dataKey="name"
+                    stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
                   />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))" 
+
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
+                    allowDecimals={false}
                   />
+
                   <Tooltip
                     contentStyle={{
                       backgroundColor: 'hsl(var(--card))',
                       borderColor: 'hsl(var(--border))',
-                      borderRadius: '12px',
                       color: 'hsl(var(--foreground))',
-                      fontSize: '12px'
+                      fontSize: '12px',
                     }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="duration" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2.5} 
-                    dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }} 
-                    activeDot={{ r: 6, strokeWidth: 0 }}
+
+                  <Bar
+                    dataKey="count"
+                    fill="hsl(var(--primary))"
                   />
-                </LineChart>
+                </BarChart>
               </ResponsiveContainer>
             </div>
-          </motion.div>
-
-          <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition group hover-lift">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Productivity gain</p>
-                  <p className="text-3xl font-bold text-emerald-500 mt-1">+42%</p>
-                </div>
-                <div className="p-3 rounded-2xl bg-emerald-500/10 group-hover:scale-110 transition">
-                  <TrendingUp size={24} className="text-emerald-500" />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-3">Estimated time saved via AI summaries</p>
+          ) : (
+            <div className="flex h-[280px] items-center justify-center text-sm text-muted-foreground">
+              No meeting activity yet
             </div>
-
-            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition group hover-lift">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Action completion rate</p>
-                  <p className="text-3xl font-bold text-primary mt-1">68%</p>
-                </div>
-                <div className="p-3 rounded-2xl bg-primary/10 group-hover:scale-110 transition">
-                  <CheckCircle size={24} className="text-primary" />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-3">Completed within 7 days</p>
-            </div>
-
-            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition group hover-lift">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">AI summary adoption</p>
-                  <p className="text-3xl font-bold text-indigo-500 mt-1">85%</p>
-                </div>
-                <div className="p-3 rounded-2xl bg-indigo-500/10 group-hover:scale-110 transition">
-                  <Zap size={24} className="text-indigo-500" />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-3">Meetings with AI summaries</p>
-            </div>
-
-            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition group hover-lift">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Total meeting hours</p>
-                  <p className="text-3xl font-bold text-orange-500 mt-1">
-                    {Math.round(meetings.reduce((acc, m) => acc + (m.duration || 0), 0) / 60)}h
-                  </p>
-                </div>
-                <div className="p-3 rounded-2xl bg-orange-500/10 group-hover:scale-110 transition">
-                  <Clock size={24} className="text-orange-500" />
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-3">Across all meetings</p>
-            </div>
-          </motion.div>
-
-          {/* Additional chart: Completion pie */}
-          <motion.div variants={item} className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg transition">
-            <h2 className="text-lg font-semibold text-foreground mb-6">Action items breakdown</h2>
-            <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={completionData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={8}
-                    dataKey="value"
-                  >
-                    {completionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      borderColor: 'hsl(var(--border))',
-                      borderRadius: '12px',
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-        </motion.div>
+          )}
+        </section>
       </div>
     </PageTransition>
   );
