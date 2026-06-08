@@ -49,12 +49,17 @@ const removePresence = async (io: Server, meetingId: string, userId: string) => 
 export const initializeMeetingSockets = (io: Server) => {
   io.on("connection", (socket) => {
     socket.on("meeting:join", async (payload: MeetingPresence) => {
+      socket.data.meetingId = payload.meetingId;
+      socket.data.userId = payload.userId;
       socket.join(payload.meetingId);
       await upsertPresence(socket, payload);
       await emitPresenceSnapshot(io, payload.meetingId);
     });
 
     socket.on("meeting:state", async (payload: MeetingPresence) => {
+      socket.data.meetingId = payload.meetingId;
+      socket.data.userId = payload.userId;
+      socket.join(payload.meetingId);
       await upsertPresence(socket, payload);
     });
 

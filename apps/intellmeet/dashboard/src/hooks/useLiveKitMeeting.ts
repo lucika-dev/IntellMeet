@@ -22,6 +22,12 @@ export type LiveKitMeetingIdentifiers = {
   meetingSlug?: string;
 };
 
+export type LiveKitMeetingOptions = {
+  enabled?: boolean;
+  initialMicEnabled?: boolean;
+  initialCameraEnabled?: boolean;
+};
+
 export type LiveKitParticipantTile = {
   id: string;
   name: string;
@@ -113,13 +119,21 @@ const resolveTokenInput = (identifiers: LiveKitMeetingIdentifiers) => {
   };
 };
 
-export const useLiveKitMeeting = (identifiers: LiveKitMeetingIdentifiers) => {
+export const useLiveKitMeeting = (
+  identifiers: LiveKitMeetingIdentifiers,
+  options: LiveKitMeetingOptions = {},
+) => {
   const {
     meetingCode,
     orgSlug,
     channelSlug,
     meetingSlug,
   } = identifiers;
+  const {
+    enabled = true,
+    initialMicEnabled = true,
+    initialCameraEnabled = true,
+  } = options;
   const [room, setRoom] = useState<Room | null>(null);
   const [meeting, setMeeting] = useState<IntellMeetMeeting | null>(null);
   const [participantRole, setParticipantRole] = useState<MeetingRole>('guest');
@@ -165,7 +179,7 @@ export const useLiveKitMeeting = (identifiers: LiveKitMeetingIdentifiers) => {
     let currentRoom: Room | null = null;
     let joinedMeetingId: string | null = null;
 
-    if (missingRoute) {
+    if (!enabled || missingRoute) {
       return;
     }
 
@@ -223,18 +237,22 @@ export const useLiveKitMeeting = (identifiers: LiveKitMeetingIdentifiers) => {
 
         let localMediaError: string | null = null;
 
-        try {
-          await currentRoom.localParticipant.setMicrophoneEnabled(true);
-        } catch {
-          localMediaError =
-            'Microphone permission was blocked. Use the mic control to try again.';
+        if (initialMicEnabled) {
+          try {
+            await currentRoom.localParticipant.setMicrophoneEnabled(true);
+          } catch {
+            localMediaError =
+              'Microphone permission was blocked. Use the mic control to try again.';
+          }
         }
 
-        try {
-          await currentRoom.localParticipant.setCameraEnabled(true);
-        } catch {
-          localMediaError =
-            'Camera permission was blocked. Use the camera control to try again.';
+        if (initialCameraEnabled) {
+          try {
+            await currentRoom.localParticipant.setCameraEnabled(true);
+          } catch {
+            localMediaError =
+              'Camera permission was blocked. Use the camera control to try again.';
+          }
         }
 
         setMediaError(localMediaError);
@@ -268,6 +286,9 @@ export const useLiveKitMeeting = (identifiers: LiveKitMeetingIdentifiers) => {
     };
   }, [
     bumpRevision,
+    enabled,
+    initialCameraEnabled,
+    initialMicEnabled,
     missingRoute,
     tokenInput,
   ]);

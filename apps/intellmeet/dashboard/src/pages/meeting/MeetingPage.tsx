@@ -1,4 +1,7 @@
-import { useMemo } from 'react';
+import {
+  useMemo,
+  useState,
+} from 'react';
 
 import { useLocation, useParams } from 'react-router-dom';
 
@@ -17,11 +20,16 @@ import { useMeetingStore } from '../../store/meetingStore';
 
 import { MeetingGrid } from './MeetingGrid';
 import { MeetingLayout } from './MeetingLayout';
+import { MeetingPermissionPrompt } from './MeetingPermissionPrompt';
 import { MeetingTopOverlay } from './MeetingTopOverlay';
 
 export const MeetingPage = () => {
   const location = useLocation();
   const params = useParams();
+  const [joinPreferences, setJoinPreferences] = useState<{
+    micEnabled: boolean;
+    cameraEnabled: boolean;
+  } | null>(null);
 
   const {
     chatOpen,
@@ -43,6 +51,10 @@ export const MeetingPage = () => {
     orgSlug: params.orgSlug,
     channelSlug: params.channelSlug,
     meetingSlug: params.meetingSlug,
+  }, {
+    enabled: Boolean(joinPreferences),
+    initialMicEnabled: joinPreferences?.micEnabled ?? true,
+    initialCameraEnabled: joinPreferences?.cameraEnabled ?? true,
   });
 
   const isHost =
@@ -53,6 +65,19 @@ export const MeetingPage = () => {
     meetingId: meetingSession.meeting?.id,
     enabled: Boolean(meetingSession.meeting?.id && meetingSession.micEnabled),
   });
+
+  if (!joinPreferences) {
+    return (
+      <MeetingPermissionPrompt
+        meetingTitle={
+          params.meetingSlug ??
+          params.meetingCode ??
+          'Meeting'
+        }
+        onJoin={setJoinPreferences}
+      />
+    );
+  }
 
   return (
     <MeetingLayout

@@ -147,11 +147,11 @@ export const MeetingTopOverlay = ({
               : 'destructive'
           }
           onClick={handleLeaveMeeting}
-          className="h-11 gap-2"
+          className="h-11 gap-2 bg-red-500 rounded-xl"
         >
-          <LogOut className="size-4" />
+          <LogOut className="size-4 text-foreground" />
 
-          <span>Leave</span>
+          <span className="text-sm text-foreground font-medium">Leave</span>
         </Button>
 
         {isHost && (

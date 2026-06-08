@@ -9,6 +9,10 @@ export const initializeMediaSockets = (io: Server) => {
     socket.on(
       "meeting:media-state",
       async ({ meetingId, userId, micEnabled, cameraEnabled, screenSharing }: { meetingId: string; userId: string; micEnabled: boolean; cameraEnabled: boolean; screenSharing: boolean }) => {
+        socket.data.meetingId = meetingId;
+        socket.data.userId = userId;
+        socket.join(meetingId);
+
         if (redis) {
           await redis.hset(
             getMediaKey(meetingId),
