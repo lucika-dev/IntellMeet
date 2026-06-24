@@ -49,6 +49,7 @@ const toMember = (
 
   return {
     id: membership.id,
+    userId: membership.user_id,
     name,
     email: profile?.email ?? '',
     role: mapRole(membership.role),

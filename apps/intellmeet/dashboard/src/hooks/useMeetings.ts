@@ -16,6 +16,8 @@ type MeetingRowResponse = {
   description: string | null;
   status: string;
   scheduled_at: string | null;
+  started_at: string | null;
+  ended_at: string | null;
   thumbnail_url: string | null;
   created_by: string | null;
   created_at: string;
@@ -309,9 +311,7 @@ export const useLiveMeetings = (
     (state) => state.user,
   );
 
-  return useQuery<
-    DashboardMeeting[]
-  >({
+  return useQuery<DashboardMeeting[]>({
     queryKey: [
       'live-meetings',
       organizationId,
@@ -337,6 +337,8 @@ export const useLiveMeetings = (
             description,
             status,
             scheduled_at,
+            started_at,
+            ended_at,
             thumbnail_url,
             created_by,
             created_at,
@@ -360,8 +362,9 @@ export const useLiveMeetings = (
             'organization_id',
             organizationId,
           )
-          .eq('status', 'live')
-          .order('created_at', {
+          .not('started_at', 'is', null)
+          .is('ended_at', null)
+          .order('started_at', {
             ascending: false,
           });
 
@@ -369,44 +372,44 @@ export const useLiveMeetings = (
         throw error;
       }
 
-      return (
-        data ?? []
-      ).map((meeting) => {
-        const row =
-          meeting as unknown as MeetingRowResponse;
+      return (data ?? []).map(
+        (meeting) => {
+          const row =
+            meeting as unknown as MeetingRowResponse;
 
-        return {
-          ...row,
+          return {
+            ...row,
 
-          organization:
-            firstRelation(
-              row.organization,
-            ),
+            organization:
+              firstRelation(
+                row.organization,
+              ),
 
-          channel:
-            firstRelation(
-              row.channel,
-            ),
+            channel:
+              firstRelation(
+                row.channel,
+              ),
 
-          participant_count:
-            Array.isArray(
-              row.meeting_participants,
-            )
-              ? row
-                  .meeting_participants
-                  .length
-              : 0,
+            participant_count:
+              Array.isArray(
+                row.meeting_participants,
+              )
+                ? row
+                    .meeting_participants
+                    .length
+                : 0,
 
-          creator_label:
-            row.created_by ===
-            user?.id
-              ? user?.name ??
-                'You'
-              : row.created_by
-                ? 'Workspace member'
-                : undefined,
-        };
-      });
+            creator_label:
+              row.created_by ===
+              user?.id
+                ? user?.name ??
+                  'You'
+                : row.created_by
+                  ? 'Workspace member'
+                  : undefined,
+          };
+        },
+      );
     },
   });
 };

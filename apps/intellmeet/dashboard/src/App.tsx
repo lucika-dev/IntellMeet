@@ -135,7 +135,7 @@ function App() {
             />
 
             <Route
-              path="/meetings"
+              path="/create"
               element={<MeetingsPage />}
             />
 
@@ -145,7 +145,7 @@ function App() {
             />
 
             <Route
-              path="/meetings/:meetingCode/summary"
+              path="/meetings/:meetingId/summary"
               element={<MeetingSummaryPage />}
             />
 

@@ -14,8 +14,9 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
-    "@wraith/auth": "workspace:*",
+    "youtube-transcript": "catalog:",
     "@supabase/supabase-js": "catalog:",
+    "@wraith/auth": "workspace:*",
     "axios": "catalog:",
     "bcrypt": "catalog:",
     "cloudinary": "catalog:",
@@ -28,10 +29,10 @@
     "helmet": "catalog:",
     "ioredis": "catalog:",
     "jsonwebtoken": "catalog:",
+    "livekit-server-sdk": "catalog:",
     "mongoose": "catalog:",
     "morgan": "catalog:",
     "multer": "catalog:",
-    "livekit-server-sdk": "catalog:",
     "socket.io": "catalog:",
     "zod": "catalog:"
   },

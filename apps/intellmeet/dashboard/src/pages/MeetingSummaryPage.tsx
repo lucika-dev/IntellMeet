@@ -1,85 +1,234 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Building2, CalendarDays } from 'lucide-react';
+import {
+  ArrowLeft,
+  CalendarDays,
+  PlayCircle,
+} from 'lucide-react';
 
 import { meetingsApi } from '../api/meetingsApi';
 import { PageTransition } from '../components/PageTransition';
 
-export const MeetingSummaryPage = () => {
-  const { meetingCode = '' } = useParams();
+const fetchTranscript = async (
+  youtubeUrl: string,
+) => {
+  const response = await fetch(
+    'http://localhost:5000/api/transcript',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type':
+          'application/json',
+      },
+      body: JSON.stringify({
+        youtubeUrl,
+      }),
+    },
+  );
 
-  const { data: meeting } = useQuery({
-    queryKey: ['meeting-summary', meetingCode],
-    queryFn: () => meetingsApi.fetchMeetingByCode(meetingCode),
-    enabled: Boolean(meetingCode),
-    staleTime: 30_000,
-  });
+  if (!response.ok) {
+    throw new Error(
+      'Failed to load transcript',
+    );
+  }
 
+  return response.json();
+};
+
+export const MeetingSummaryPage =
+  () => {
+    const navigate =
+      useNavigate();
+
+    const {
+      meetingId = '',
+    } = useParams();
+
+    const {
+      data: meeting,
+      isLoading:
+        meetingLoading,
+      error:
+        meetingError,
+    } = useQuery({
+      queryKey: [
+        'recorded-meeting',
+        meetingId,
+      ],
+      queryFn: () =>
+        meetingsApi.fetchRecordedMeeting(
+          meetingId,
+        ),
+      enabled:
+        Boolean(meetingId),
+    });
+
+    const {
+      data: transcriptData,
+      isLoading:
+        transcriptLoading,
+      error:
+        transcriptError,
+    } = useQuery({
+      queryKey: [
+        'transcript',
+        meeting?.youtube_url,
+      ],
+      queryFn: () =>
+        fetchTranscript(
+          meeting!.youtube_url,
+        ),
+      enabled:
+        Boolean(
+          meeting?.youtube_url,
+        ),
+    });
+
+    if (meetingLoading) {
+      return (
+        <PageTransition>
+          <div className="flex h-full items-center justify-center">
+            Loading recordedMeeting...
+          </div>
+        </PageTransition>
+      );
+    }
+
+if (meetingError) {
   return (
     <PageTransition>
-      <div className="flex h-full min-h-0 flex-col gap-5 overflow-hidden">
-        <div className="glass-card p-5">
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
-            Meeting summary
-          </p>
-
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
-            {meeting?.title || 'Meeting summary'}
-          </h1>
-
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <Building2 size={14} />
-              {meeting?.organization_name || 'Workspace'}
-            </span>
-
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarDays size={14} />
-              {meeting
-                ? new Intl.DateTimeFormat(undefined, {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                  }).format(new Date(meeting.scheduled_time))
-                : 'Loading'}
-            </span>
-          </div>
-        </div>
-
-        <div className="grid min-h-0 flex-1 gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-          <section className="glass-card p-5">
-            <h2 className="text-lg font-semibold text-foreground">Session recap</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              This summary route is wired to the same meeting record as the room page, so the backend can render recordings, notes, and action items from Supabase once they are saved.
-            </p>
-
-            <a href="/meetings" className="mt-6 inline-flex items-center gap-2 border border-border/50 bg-background/40 px-4 py-2 text-sm font-medium text-foreground backdrop-blur-xl transition-colors hover:bg-accent/30">
-              <ArrowLeft size={14} />
-              Back to meetings
-            </a>
-          </section>
-
-          <section className="glass-card p-5">
-            <h2 className="text-lg font-semibold text-foreground">Room metadata</h2>
-
-            <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <div className="border border-border/50 bg-background/40 p-4">
-                <p className="text-foreground">Meeting code</p>
-                <p className="mt-1">{meeting?.meeting_code || meetingCode}</p>
-              </div>
-
-              <div className="border border-border/50 bg-background/40 p-4">
-                <p className="text-foreground">Status</p>
-                <p className="mt-1 capitalize">{meeting?.status || 'Loading'}</p>
-              </div>
-
-              <div className="border border-border/50 bg-background/40 p-4">
-                <p className="text-foreground">Participants</p>
-                <p className="mt-1">{meeting?.participant_count || 0}</p>
-              </div>
-            </div>
-          </section>
+      <div className="flex h-full items-center justify-center">
+        <div className="border border-border bg-card p-8">
+          Failed to load meeting
         </div>
       </div>
     </PageTransition>
   );
-};
+}
+
+if (!meeting) {
+  return (
+    <PageTransition>
+      <div className="flex h-full items-center justify-center">
+        <div className="border border-border bg-card p-8">
+          Meeting not found
+        </div>
+      </div>
+    </PageTransition>
+  );
+}
+
+const recordedMeeting = meeting;
+
+    return (
+      <PageTransition>
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
+
+          <button
+            onClick={() =>
+              navigate(-1)
+            }
+            className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft
+              size={14}
+            />
+            Back
+          </button>
+
+          <div className="overflow-hidden border border-border bg-card shadow-sm">
+            {recordedMeeting.thumbnail_url ? (
+              <img
+                src={
+                  recordedMeeting.thumbnail_url
+                }
+                alt={
+                  recordedMeeting.title
+                }
+                className="aspect-video w-full object-cover"
+              />
+            ) : (
+              <div className="flex aspect-video items-center justify-center bg-muted text-muted-foreground">
+                No Thumbnail
+              </div>
+            )}
+          </div>
+
+          <div className="border border-border bg-card p-6 shadow-sm">
+            <h1 className="text-4xl font-semibold tracking-tight">
+              {recordedMeeting.title}
+            </h1>
+
+            <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-2">
+                <CalendarDays
+                  size={14}
+                />
+                {new Intl.DateTimeFormat(
+                  undefined,
+                  {
+                    dateStyle:
+                      'medium',
+                    timeStyle:
+                      'short',
+                  },
+                ).format(
+                  new Date(
+                    recordedMeeting.created_at,
+                  ),
+                )}
+              </span>
+            </div>
+
+            {recordedMeeting.youtube_url && (
+              <a
+                href={
+                  recordedMeeting.youtube_url
+                }
+                target="_blank"
+                rel="noreferrer"
+                className="mt-6 inline-flex items-center gap-2 border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
+              >
+                <PlayCircle
+                  size={16}
+                />
+                Open Video
+              </a>
+            )}
+          </div>
+
+          <div className="border border-border bg-card p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold">
+              Description
+            </h2>
+
+            <div className="mt-4 whitespace-pre-wrap leading-7 text-muted-foreground">
+              {recordedMeeting.description ||
+                'No description available'}
+            </div>
+          </div>
+
+          <div className="border border-border bg-card p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold">
+              Transcript
+            </h2>
+
+            {transcriptLoading ? (
+              <div className="mt-4 text-muted-foreground">
+                Loading transcript...
+              </div>
+            ) : transcriptError ? (
+              <div className="mt-4 text-destructive">
+                Failed to load transcript
+              </div>
+            ) : (
+              <div className="mt-4 max-h-[900px] overflow-y-auto whitespace-pre-wrap rounded border border-border bg-background p-6 text-sm leading-8">
+                {transcriptData?.transcript ||
+                  'Transcript unavailable'}
+              </div>
+            )}
+          </div>
+        </div>
+      </PageTransition>
+    );
+  };

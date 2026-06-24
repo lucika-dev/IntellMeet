@@ -4,8 +4,15 @@ const API_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ||
   'http://localhost:5000/api';
 
-export type MeetingStatus = 'scheduled' | 'live' | 'recorded' | 'ended';
-export type MeetingMode = 'instant' | 'scheduled';
+export type MeetingStatus =
+  | 'scheduled'
+  | 'live'
+  | 'recorded'
+  | 'ended';
+
+export type MeetingMode =
+  | 'instant'
+  | 'scheduled';
 
 export interface MeetingRecord {
   id: string;
@@ -23,89 +30,225 @@ export interface MeetingRecord {
   updated_at: string;
 }
 
+export interface RecordedMeeting {
+  id: string;
+  organization_id: string;
+  channel_id: string | null;
+  uploaded_by: string;
+
+  title: string;
+  description: string | null;
+
+  youtube_url: string;
+  thumbnail_url: string | null;
+
+  duration: string | null;
+  created_at: string;
+}
+
 export interface CreateMeetingInput {
   title: string;
+  description?: string;
+
   scheduleMode: MeetingMode;
   scheduledAt: string;
+
   organizationName: string;
   image?: File | null;
 }
 
-const buildHeaders = async (isFormData = false) => {
-  const { data } = await supabase.auth.getSession();
-  const headers: Record<string, string> = {};
+const buildHeaders = async (
+  isFormData = false,
+) => {
+  const { data } =
+    await supabase.auth.getSession();
 
-  if (data.session?.access_token) {
+  const headers: Record<
+    string,
+    string
+  > = {};
+
+  if (
+    data.session?.access_token
+  ) {
     headers.Authorization = `Bearer ${data.session.access_token}`;
   }
 
   if (!isFormData) {
-    headers['Content-Type'] = 'application/json';
+    headers['Content-Type'] =
+      'application/json';
   }
 
   return headers;
 };
 
-const requestJson = async <T>(path: string): Promise<T> => {
-  const response = await fetch(`${API_URL}${path}`, {
-    headers: await buildHeaders(),
-  });
+const requestJson = async <T>(
+  path: string,
+): Promise<T> => {
+  const response =
+    await fetch(
+      `${API_URL}${path}`,
+      {
+        headers:
+          await buildHeaders(),
+      },
+    );
 
   if (!response.ok) {
-    throw new Error(await response.text());
+    throw new Error(
+      await response.text(),
+    );
   }
 
   return response.json();
 };
 
 export const meetingsApi = {
-  fetchMeetings: async (): Promise<MeetingRecord[]> => {
-    const data = await requestJson<{ meetings: MeetingRecord[] }>('/meetings');
+  fetchMeetings: async (): Promise<
+    MeetingRecord[]
+  > => {
+    const data =
+      await requestJson<{
+        meetings: MeetingRecord[];
+      }>('/meetings');
+
     return data.meetings;
   },
-  fetchLiveMeetings: async (): Promise<MeetingRecord[]> => {
-    const data = await requestJson<{ meetings: MeetingRecord[] }>('/meetings/live');
+
+  fetchLiveMeetings: async (): Promise<
+    MeetingRecord[]
+  > => {
+    const data =
+      await requestJson<{
+        meetings: MeetingRecord[];
+      }>('/meetings/live');
+
     return data.meetings;
   },
-  fetchMeetingByCode: async (meetingCode: string): Promise<MeetingRecord> => {
-    const data = await requestJson<{ meeting: MeetingRecord }>(`/meetings/${meetingCode}`);
+
+  fetchMeetingByCode: async (
+    meetingCode: string,
+  ): Promise<MeetingRecord> => {
+    const data =
+      await requestJson<{
+        meeting: MeetingRecord;
+      }>(
+        `/meetings/${meetingCode}`,
+      );
+
     return data.meeting;
   },
-  createMeeting: async (input: CreateMeetingInput): Promise<MeetingRecord> => {
-    const formData = new FormData();
-    formData.append('title', input.title);
-    formData.append('scheduleMode', input.scheduleMode);
-    formData.append('scheduledAt', input.scheduledAt);
-    formData.append('organizationName', input.organizationName);
+
+  fetchRecordedMeeting: async (
+    id: string,
+  ): Promise<RecordedMeeting> => {
+    const {
+      data,
+      error,
+    } = await supabase
+      .from(
+        'recorded_meetings',
+      )
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  },
+
+  createMeeting: async (
+    input: CreateMeetingInput,
+  ): Promise<MeetingRecord> => {
+    const formData =
+      new FormData();
+
+    formData.append(
+      'title',
+      input.title,
+    );
+
+    formData.append(
+  'description',
+    input.description ?? '',
+  );
+
+    formData.append(
+      'scheduleMode',
+      input.scheduleMode,
+    );
+
+    formData.append(
+      'scheduledAt',
+      input.scheduledAt,
+    );
+
+    formData.append(
+      'organizationName',
+      input.organizationName,
+    );
 
     if (input.image) {
-      formData.append('image', input.image);
+      formData.append(
+        'image',
+        input.image,
+      );
     }
 
-    const response = await fetch(`${API_URL}/meetings`, {
-      method: 'POST',
-      headers: await buildHeaders(true),
-      body: formData,
-    });
+    const response =
+      await fetch(
+        `${API_URL}/meetings`,
+        {
+          method: 'POST',
+          headers:
+            await buildHeaders(
+              true,
+            ),
+          body: formData,
+        },
+      );
 
     if (!response.ok) {
-      throw new Error(await response.text());
+      throw new Error(
+        await response.text(),
+      );
     }
 
-    const data = (await response.json()) as { meeting: MeetingRecord };
+    const data =
+      (await response.json()) as {
+        meeting: MeetingRecord;
+      };
+
     return data.meeting;
   },
-  joinMeeting: async (meetingCode: string): Promise<MeetingRecord> => {
-    const response = await fetch(`${API_URL}/meetings/${meetingCode}/join`, {
-      method: 'POST',
-      headers: await buildHeaders(),
-    });
+
+  joinMeeting: async (
+    meetingCode: string,
+  ): Promise<MeetingRecord> => {
+    const response =
+      await fetch(
+        `${API_URL}/meetings/${meetingCode}/join`,
+        {
+          method: 'POST',
+          headers:
+            await buildHeaders(),
+        },
+      );
 
     if (!response.ok) {
-      throw new Error(await response.text());
+      throw new Error(
+        await response.text(),
+      );
     }
 
-    const data = (await response.json()) as { meeting: MeetingRecord };
+    const data =
+      (await response.json()) as {
+        meeting: MeetingRecord;
+      };
+
     return data.meeting;
   },
 };

@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@astrojs/react": "^5.0.6",
+    "@astrojs/react": "catalog:",
+    "@dnd-kit/core": "catalog:",
+    "@dnd-kit/sortable": "catalog:",
+    "@dnd-kit/utilities": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-query": "catalog:",
@@ -19,8 +22,8 @@
     "clsx": "catalog:",
     "date-fns": "catalog:",
     "framer-motion": "catalog:",
-    "lucide-react": "catalog:",
     "livekit-client": "catalog:",
+    "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
@@ -28,9 +31,9 @@
     "react-router-dom": "catalog:",
     "recharts": "catalog:",
     "socket.io-client": "catalog:",
-    "tw-animate-css": "catalog:",
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
+    "tw-animate-css": "catalog:",
     "zustand": "catalog:"
   },
   "devDependencies": {

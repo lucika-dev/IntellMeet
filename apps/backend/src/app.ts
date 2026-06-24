@@ -7,6 +7,7 @@ import socialRoutes from "@/routes/social.routes";
 import livekitRoutes from "@/apps/intellmeet/routes/livekit.routes";
 import meetingRoutes from "@/apps/intellmeet/routes/meeting.routes";
 import participantRoutes from "@/apps/intellmeet/routes/participant.routes";
+import transcriptRoutes from './routes/transcript';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/social", socialRoutes);
 app.use("/api/intellmeet/livekit", livekitRoutes);
 app.use("/api/intellmeet/meetings", meetingRoutes);
 app.use("/api/intellmeet/participants", participantRoutes);
+app.use("/api/transcript", transcriptRoutes,);
 
 app.get("/", (_req, res) => {
   res.send("IntellMeet Backend Running");

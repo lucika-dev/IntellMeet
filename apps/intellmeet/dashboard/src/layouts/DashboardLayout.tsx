@@ -18,9 +18,9 @@ export const DashboardLayout = () => {
       <div className="flex min-h-0 flex-1 overflow-hidden pt-20">
         <Sidebar collapsed={collapsed} />
 
-        <main className="min-h-0 min-w-0 flex-1 overflow-hidden px-4 py-5 md:px-6 lg:px-8">
-          <Outlet />
-        </main>
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-5 md:px-6 lg:px-8">
+  <Outlet />
+</main>
 
         <aside className="hidden h-full w-96 shrink-0 border-l border-border xl:block">
           <LivePanel />
